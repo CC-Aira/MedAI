@@ -146,9 +146,28 @@ Windows 下双击根目录的 `Start MedAI.bat` 即可，首次运行会自动�
 | `MEDAI_DEMO_AI` | 设为 `1` 时走本地模拟流，无需 Key 也能演练全链路 |
 | `MEDAI_DEMO_LOGIN` | 设为 `1` 时登录页出现「用演示账号直接进去」 |
 | `MEDAI_CHAT_RETENTION_DAYS` | 对话原文保留天数，默认 30 |
+| `MEDAI_COOKIE_INSECURE` | 局域网 `http://192.168.x.x` 演示时设为 `1`，关闭 cookie 的 Secure 标记（详见下方「在别的设备上访问」） |
 
 `.env` 里 `MEDAI_DEMO_LOGIN=1` 时，登录页会多一个「用演示账号直接进去」的按钮 —— 现场演示不用敲密码，
 也避不开限流（它走的就是正常的登录接口，密码错了照样 401）。正式环境留空即可。
+
+### 在别的设备上访问
+
+| 场景 | 做法 |
+|---|---|
+| 同一局域网（手机 / 另一台电脑的浏览器） | 本机 `ipconfig` 查内网 IP，访问 `http://192.168.x.x:3100`；Windows 防火墙要放行 Node 入站 |
+| 不在同一个网络 | `cloudflared tunnel --url http://localhost:3100`，把拿到的 `https://xxx.trycloudflare.com` 发过去 |
+| 拷到另一台电脑跑 | 带源码 + `.env` + `prisma/dev.db` + `node_modules`（或在新机 `npm install`），双击 `Start MedAI.bat` |
+
+局域网明文访问有个坑：生产模式的会话 cookie 带 `Secure` 标记，浏览器在 `http://` 非 localhost 地址下
+会**直接丢弃**它，表现为「密码正确、页面却立刻退回登录页」。这种情况在 `.env` 里加一行并重启：
+
+```
+MEDAI_COOKIE_INSECURE="1"
+```
+
+走 HTTPS（隧道 / 反代）时不要开。演示账号 `demo@medai.local` / `Medai@2026`；把 `MEDAI_DEMO_LOGIN`
+设为 `1` 后，登录页还会多一个「用演示账号直接进去」的按钮。
 
 ### 常用命令
 

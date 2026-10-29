@@ -75,12 +75,25 @@ export function readSessionToken(token: string | undefined | null): TokenPayload
 
 /* ------------------------------------------------------------ Cookie 读写 */
 
+/**
+ * 生产模式默认给会话 cookie 打 Secure 标记（只允许 HTTPS 传输）。
+ *
+ * 例外是评审 / 答辩现场：常出现"只有局域网、没有外网"的情况，此时用
+ * http://192.168.x.x:3100 访问，浏览器会直接丢弃带 Secure 的 cookie，
+ * 表现为"登录成功后立刻退回登录页"。这种场合把 MEDAI_COOKIE_INSECURE 设为 1，
+ * 只关闭 Secure 一项，HttpOnly 与 SameSite 保持不变；默认不设，安全姿态不降。
+ */
+function cookieSecure(): boolean {
+  if (process.env.NODE_ENV !== "production") return false;
+  return process.env.MEDAI_COOKIE_INSECURE !== "1";
+}
+
 export async function setSessionCookie(userId: string): Promise<void> {
   const store = await cookies();
   store.set(SESSION_COOKIE, createSessionToken(userId), {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: cookieSecure(),
     path: "/",
     maxAge: SESSION_TTL_SECONDS,
   });
@@ -91,7 +104,7 @@ export async function clearSessionCookie(): Promise<void> {
   store.set(SESSION_COOKIE, "", {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: cookieSecure(),
     path: "/",
     maxAge: 0,
   });
