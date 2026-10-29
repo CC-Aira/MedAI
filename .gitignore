@@ -38,3 +38,6 @@ docs/submission/doc_check.pdf
 # 演示文稿工具的中间缓存与图片缓存
 .slidep/
 **/.cache/
+
+# 无法装在 C 盘、且非源码的本地辅助脚本
+push-to-github.bat
