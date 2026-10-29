@@ -1,0 +1,164 @@
+// MedAI · 多患者 AI 辅助问诊系统
+// 6 张表：User + Patient / Medication / Consultation / Message / Note
+// SQLite 没有原生 enum，状态类字段一律用 String + 应用层白名单校验。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  passwordHash String // scrypt$salt$hash，永不存明文
+  createdAt    DateTime     @default(now())
+  patients     Patient[]
+  attachments  Attachment[]
+}
+
+model Patient {
+  id             String   @id @default(cuid())
+  ownerId        String // 归属账号，核心隔离字段
+  owner          User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name           String
+  gender         String // male | female
+  avatarUrl      String? // /uploads/avatars/xxx.png
+  birthDate      DateTime?
+  age            Int?
+  heightCm       Float?
+  weightKg       Float?
+  bloodType      String?
+  constitution   String? // 中医体质
+  habits         String? // 生活习惯
+  allergies      String? // 过敏史（对话时强制注入）
+  chronicDisease String? // 既往病史
+  chiefComplaint String? // 主诉
+  medications    Medication[]
+  consultations  Consultation[]
+  notes          Note[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([ownerId, createdAt])
+}
+
+model Medication {
+  id        String    @id @default(cuid())
+  patientId String
+  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  drugName  String
+  dosage    String? // "5mg"
+  frequency String? // "每日一次"
+  startDate DateTime?
+  endDate   DateTime?
+  isActive  Boolean   @default(true) // 在服 / 已停用
+  note      String?
+
+  /// 每天几点吃，24 小时制 "08:00"；提醒文案要用
+  timeOfDay  String?
+  /// before | after | any（饭前 / 饭后 / 不限）
+  mealTiming String?
+  /// 疗程总天数；留空就用 startDate~endDate 推算
+  courseDays Int?
+
+  logs      MedicationLog[]
+  createdAt DateTime        @default(now())
+
+  @@index([patientId, isActive])
+}
+
+/// 用药打卡：一天记一行。没打卡的过去日期在结算时算漏服。
+model MedicationLog {
+  id           String     @id @default(cuid())
+  medicationId String
+  medication   Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  /// 这一行对应哪一天（取当地 00:00），一天只允许一条
+  scheduledFor DateTime
+  /// 实际打卡时间；null 表示只登记了"跳过"
+  takenAt      DateTime?
+  /// taken | skipped
+  status       String
+  createdAt    DateTime   @default(now())
+
+  @@unique([medicationId, scheduledFor])
+  @@index([medicationId, scheduledFor])
+}
+
+model Consultation {
+  id        String  @id @default(cuid())
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  title     String
+  status    String  @default("active") // active | archived
+  summary   String? // AI 小结，作为后续会话的长期记忆
+  /// 触发过红旗拦截时记下的 JSON（类别、时间、次数）；就诊摘要要引用它
+  redFlag   String?
+  /// 就诊摘要 JSON：单独存一份，方便「打完就带走」和重复打印，不必每次重算
+  visitSheet String?
+  messages  Message[]
+  notes     Note[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId, updatedAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  consultationId String
+  consultation   Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  role           String // user | assistant
+  content        String
+  /// 这条回答的来源标记：null = 模型回答；"redflag" = 本地红旗拦截生成的
+  flag           String?
+  /// 用户改过这句话的时间；null = 没改过
+  editedAt       DateTime?
+  /// 附带的文件/图片，null = 纯文字
+  attachmentId   String?
+  attachment     Attachment?  @relation(fields: [attachmentId], references: [id], onDelete: SetNull)
+  createdAt      DateTime     @default(now())
+
+  @@index([consultationId, createdAt])
+}
+
+/**
+ * 用户上传给 AI 看的资料：病历照片、化验单、药盒、PDF 报告。
+ * text 是服务端提取出来的文字，提示词只用它，绝不把二进制塞给模型。
+ * 对话按保留窗口自动清理时，消息删掉但附件保留原文件引用，供用户自己查看。
+ */
+model Attachment {
+  id        String    @id @default(cuid())
+  ownerId   String
+  owner     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  filename  String
+  mimeType  String
+  sizeBytes Int
+  kind      String // image | pdf | docx | text
+  /// 提取出的正文；图片没识别出字就是空串
+  text      String    @default("")
+  /// 磁盘上的文件名（服务器生成），读取走 /api/attachments/[id]/raw
+  storedName String?
+  createdAt DateTime  @default(now())
+  messages  Message[]
+
+  @@index([ownerId, createdAt])
+}
+
+model Note {
+  id             String        @id @default(cuid())
+  patientId      String
+  patient        Patient       @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  consultationId String?
+  consultation   Consultation? @relation(fields: [consultationId], references: [id], onDelete: SetNull)
+  title          String
+  content        String
+  tags           String? // 逗号分隔
+  isFavorite     Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+
+  @@index([patientId, isFavorite, createdAt])
+}
