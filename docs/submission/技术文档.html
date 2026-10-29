@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>MedAI 技术文档</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 16mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    font-family: "Songti SC", "SimSun", "Source Han Serif SC", serif;
+    font-size: 10.5pt; line-height: 1.85; color: #1c1f1a;
+    background: #fff;
+  }
+  h1, h2, h3, h4, .sans { font-family: "Microsoft YaHei", "PingFang SC", "Heiti SC", sans-serif; }
+  h2 {
+    font-size: 15pt; margin: 22pt 0 8pt; padding-bottom: 5pt;
+    border-bottom: 1.6pt solid #2f4a2b; color: #22331f;
+    page-break-after: avoid;
+  }
+  h3 { font-size: 11.5pt; margin: 14pt 0 4pt; color: #2f4a2b; page-break-after: avoid; }
+  h4 { font-size: 10.5pt; margin: 10pt 0 3pt; color: #3d3f38; page-break-after: avoid; }
+  p { margin: 0 0 7pt; text-align: justify; }
+  ul, ol { margin: 0 0 8pt; padding-left: 18pt; }
+  li { margin-bottom: 3.5pt; }
+  code {
+    font-family: "Cascadia Mono", Consolas, monospace; font-size: 9pt;
+    background: #f2f1ea; padding: 0.5pt 3pt; border-radius: 3px;
+  }
+  b, strong { font-weight: 700; }
+  em { font-style: normal; background: #fbf0c4; padding: 0 2pt; border-radius: 2pt; }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 9pt; }
+  tr { page-break-inside: avoid; }
+  th, td { border: 0.6pt solid #c9c6b8; padding: 4.5pt 6pt; vertical-align: top; line-height: 1.6; }
+  th { background: #eef0e6; font-family: "Microsoft YaHei", sans-serif; font-weight: 700; text-align: left; }
+  td.c, th.c { text-align: center; }
+  figure { margin: 8pt 0 12pt; page-break-inside: avoid; text-align: center; }
+  figure img { width: 100%; border: 0.6pt solid #d5d2c4; border-radius: 2pt; }
+  figcaption {
+    font-family: "Microsoft YaHei", sans-serif; font-size: 8.5pt; color: #6b6a5f;
+    margin-top: 3pt; text-align: center;
+  }
+  .fig-half { width: 62%; margin: 0 auto; }
+  .fig-mid { width: 80%; margin: 0 auto; }
+  .note {
+    border-left: 3pt solid #c9a227; background: #fbf7e8;
+    padding: 7pt 10pt; margin: 8pt 0 10pt; font-size: 9.5pt;
+  }
+  /* 封面 */
+  .cover { height: 246mm; display: flex; flex-direction: column; page-break-after: always; }
+  .cover__top { font-family: "Microsoft YaHei", sans-serif; font-size: 9pt; letter-spacing: 0.16em; color: #6b6a5f; }
+  .cover__mid { margin-top: 52mm; }
+  .cover__tag {
+    display: inline-block; font-family: "Microsoft YaHei", sans-serif; font-size: 8.5pt;
+    letter-spacing: 0.1em; color: #2f4a2b; border: 0.8pt solid #2f4a2b;
+    padding: 2.5pt 8pt; border-radius: 20pt; margin-bottom: 14pt;
+  }
+  .cover h1 { font-size: 30pt; margin: 0 0 6pt; letter-spacing: 0.02em; }
+  .cover__sub { font-size: 13pt; color: #4a5a44; margin-bottom: 4pt; }
+  .cover__en { font-family: "Microsoft YaHei", sans-serif; font-size: 9pt; letter-spacing: 0.22em; color: #9a978a; }
+  .cover__meta { margin-top: 44mm; font-family: "Microsoft YaHei", sans-serif; font-size: 9.5pt; line-height: 2.1; }
+  .cover__meta span { display: inline-block; width: 22mm; color: #6b6a5f; }
+  .cover__rule { width: 40mm; height: 2.5pt; background: #2f4a2b; margin: 18pt 0 0; }
+  /* 目录 */
+  .toc { page-break-after: always; }
+  .toc h2 { border: 0; }
+  .toc ol { list-style: none; padding-left: 0; }
+  .toc li {
+    font-family: "Microsoft YaHei", sans-serif; font-size: 10pt;
+    padding: 5pt 0; display: flex; align-items: baseline;
+  }
+  .toc li .sec { color: #6b6a5f; width: 10mm; flex: none; }
+  .toc li .dots { flex: 1; border-bottom: 0.5pt dotted #cfccbe; margin: 0 5pt 2.5pt; }
+  .toc li .pg { width: 9mm; text-align: right; color: #55544a; flex: none; }
+  .page-break { page-break-before: always; }
+  /* 每一大节另起一页：避免出现「标题孤零零挂在页脚」和表格被拦腰截断 */
+  body > section + section { page-break-before: always; }
+  .avoid { page-break-inside: avoid; }
+  .small { font-size: 9pt; color: #55544a; }
+  /* 架构图：不用图片，避免缩放糊；三层用 flex 堆叠 */
+  .arch { margin: 10pt 0 12pt; page-break-inside: avoid; }
+  .arch__row {
+    display: flex; gap: 5pt; margin-bottom: 5pt;
+    font-family: "Microsoft YaHei", sans-serif; font-size: 8.5pt; line-height: 1.5;
+  }
+  .arch__label {
+    width: 22mm; flex: none; color: #4a5a44; font-weight: 700;
+    display: flex; align-items: center;
+  }
+  .arch__box {
+    flex: 1; border: 0.7pt solid #b9c4ae; background: #f6f7f0;
+    border-radius: 2pt; padding: 5pt 6pt;
+  }
+  .arch__box b { color: #22331f; }
+  .arch__box--ai { border-color: #c9a227; background: #fbf7e8; }
+  .arch__box--data { border-color: #b0b8c9; background: #f3f4f8; }
+  .arch__arrow {
+    text-align: center; color: #9a978a; font-size: 9pt; line-height: 1;
+    margin: 1pt 0 3pt 27mm;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ 封面 ============ -->
+<section class="cover">
+  <div class="cover__top">全国大学生计算机应用能力与数字素养大赛 · 第九届传智杯</div>
+
+  <div class="cover__mid">
+    <span class="cover__tag">AI WEB 网页开发挑战赛</span>
+    <h1>MedAI</h1>
+    <p class="cover__sub">草地上的绒球医生 —— 给每个家庭的一份健康档案</p>
+    <p class="cover__en">技术文档</p>
+    <div class="cover__rule"></div>
+  </div>
+
+  <div class="cover__meta">
+    <div><span>参赛院校</span>广东医科大学</div>
+    <div><span>参赛组别</span>B 组（本科）</div>
+    <div><span>团队成员</span>陈妍萱　【待补充】</div>
+    <div><span>指导教师</span>【待补充】</div>
+    <div><span>联系方式</span>【待补充】</div>
+    <div><span>完成日期</span>2026 年 10 月</div>
+  </div>
+</section>
+
+<!-- ============ 目录 ============ -->
+<section class="toc">
+  <h2>目录</h2>
+  <ol>
+    <li><span class="sec">01</span><span>项目概述</span><span class="dots"></span><span class="pg" data-p="01">3</span></li>
+    <li><span class="sec">02</span><span>需求分析</span><span class="dots"></span><span class="pg" data-p="02">5</span></li>
+    <li><span class="sec">03</span><span>系统架构设计</span><span class="dots"></span><span class="pg" data-p="03">7</span></li>
+    <li><span class="sec">04</span><span>AI 技术方案</span><span class="dots"></span><span class="pg" data-p="04">9</span></li>
+    <li><span class="sec">05</span><span>核心功能实现</span><span class="dots"></span><span class="pg" data-p="05">12</span></li>
+    <li><span class="sec">06</span><span>创新点说明</span><span class="dots"></span><span class="pg" data-p="06">15</span></li>
+    <li><span class="sec">07</span><span>测试与部署</span><span class="dots"></span><span class="pg" data-p="07">17</span></li>
+    <li><span class="sec">08</span><span>总结与展望</span><span class="dots"></span><span class="pg" data-p="08">19</span></li>
+    <li><span class="sec">附</span><span>附录：引用说明 · 运行方式 · 演示账号</span><span class="dots"></span><span class="pg" data-p="附">22</span></li>
+  </ol>
+
+  <div class="note" style="margin-top:20pt">
+    <b>一句话说明这个作品在做什么。</b>
+    MedAI 是一个面向普通家庭的健康档案与 AI 问诊工具：一个账号管全家人的档案，把"该吃什么药、
+    该不该去医院、复诊时怎么跟医生说"这三件最日常也最容易出错的事，放在一片能点开的草地上。
+    它不替代医生 —— 只做记录、提醒、翻译和整理。
+  </div>
+
+  <table style="margin-top:14pt">
+    <tr><th style="width:26%">项目速览</th><th>内容</th></tr>
+    <tr><td>形态</td><td>Web 应用（桌面 / 移动端响应式），可离线私有化部署</td></tr>
+    <tr><td>技术栈</td><td>Next.js 16 + React 19 + TypeScript 5.9 + Three.js 0.170 + Prisma 6 + SQLite</td></tr>
+    <tr><td>AI 能力</td><td>DeepSeek 流式问诊 + 个体化提示词装配 + 11 条本地红旗规则 + 事实核对</td></tr>
+    <tr><td>内容规模</td><td>90 条疾病科普 · 73 种药品说明 · 13 个科室 · 18 组自绘 SVG 插图</td></tr>
+    <tr><td>代码规模</td><td>约 2.7 万行（TS / TSX / JS，不含依赖与构建产物）· 23 个 API 路由</td></tr>
+    <tr><td>自检覆盖</td><td>接口 68 项 · 木牌 33 项 · 提醒 20 项 · 登录 18 项 · 入口 8 项，全部通过</td></tr>
+  </table>
+</section>
+
+<!-- ============ 01 ============ -->
+<section>
+  <h2>01　项目概述</h2>
+
+  <h3>1.1 作品简介</h3>
+  <p>
+    MedAI 面向"一个家里谁在管药"这件事。它把家庭成员的档案、在服药物、问诊记录、就诊摘要
+    收在一个账号里，用一片可以点开的 3D 草地作为入口：<b>家里每个人是一块小牌子，点开就能对话；
+    天上吊着一块木板，写着全家今天吃了几次药，点一下就能打卡</b>。
+  </p>
+  <p>
+    产品的边界写得很清楚：<em>不做诊断、不开处方、不替用户判断"哪句话重要"</em>。
+    AI 只承担三件事 —— 把专业术语翻译成人话、把散落的信息整理成可执行的动作、
+    把一次问诊整理成一张能带去医院的纸。判断权始终在患者手里。
+  </p>
+  <figure>
+    <img src="../preview-home.png" alt="草地首页" />
+    <figcaption>图 1　草地首页：左栏是家人的档案，天上吊着用药木牌，绒球医生会看着鼠标</figcaption>
+  </figure>
+
+  <h3>1.2 背景与意义</h3>
+  <p>
+    中国有超过 3 亿的慢性病患者，其中相当一部分是老年人；与此同时，"一个家庭里谁在管药"这件事，
+    通常落在家里那个二三十岁的年轻人身上。他要记得父母各吃什么药、哪天该复诊、孩子发烧到多少度该去医院，
+    还要在下班后替父母把"医生说的一堆话"翻译成能执行的动作。
+  </p>
+  <p>
+    这件事的难处不在于信息不够，而在于<em>信息散落在药盒、纸质病历、微信聊天记录和老人的记忆里</em>。
+    家里老人吃几种药，子女往往说不全；上一次问诊医生说了什么，一周后基本只剩一句"多喝水"。
+  </p>
+
+  <h4>现有工具为什么没解决</h4>
+  <table>
+    <tr><th style="width:26%">现有形态</th><th>它做到的</th><th>它缺的</th></tr>
+    <tr>
+      <td>手机闹钟 / 药盒提醒器</td>
+      <td>到点响，便宜、可靠</td>
+      <td>只知道"该吃药了"，不知道"谁该吃、吃几片、吃没吃"；换个人就全乱</td>
+    </tr>
+    <tr>
+      <td>医院 App / 互联网医院</td>
+      <td>能挂号、能复诊、有电子病历</td>
+      <td>每家医院一套，跨院不通；面向"这一次就诊"，不面向"这一年"</td>
+    </tr>
+    <tr>
+      <td>通用 AI 聊天</td>
+      <td>什么都能问，门槛低</td>
+      <td>没有档案就没有个体化；不了解过敏史、在服药物，建议只能停在科普层面</td>
+    </tr>
+    <tr>
+      <td>健康管理类 App</td>
+      <td>功能齐全、数据维度多</td>
+      <td>要填的太多，老人用不了；界面像体检报告，看不下去</td>
+    </tr>
+  </table>
+  <p>
+    结论是：<b>缺的不是功能，而是一个"全家共用、一个人维护、老人也看得懂"的容器</b>。
+    这个容器还必须解决一个矛盾 —— 数据要共享（全家人看得到），隐私不能共享（别人一份都看不到）。
+  </p>
+
+  <h3>1.3 应用场景与目标用户</h3>
+  <table>
+    <tr><th style="width:22%">角色</th><th style="width:30%">是谁</th><th>他真正在意的一件事</th></tr>
+    <tr><td>主要使用者</td><td>25–45 岁，家里管事的那个子女</td><td>爸妈今天吃药了没有；孩子夜里发烧要不要去急诊</td></tr>
+    <tr><td>被照护者</td><td>父母（多为慢病）、老人、儿童</td><td>不想学新东西；只想知道"现在该干什么"</td></tr>
+    <tr><td>次要使用者</td><td>异地子女、家庭护工</td><td>不在身边也能看到今天的情况</td></tr>
+  </table>
+
+  <p><b>场景一：早上七点，厨房。</b>手机在灶台边响了一声，兔子在草地上说"该给妈妈吃降压药了"。
+  用户腾不出手，就把手机架起来点了一下木牌上那一行 —— 打卡完成，板子上的 2/5 变成 3/5。
+  整个过程两个动作，不用进任何二级页面。</p>
+  <p><b>场景二：夜里十一点，孩子发烧。</b>用户打开草地，点孩子的牌子问"39 度，一直哭，要不要去医院"。
+  系统先做本地红旗判断（有没有抽搐、意识不清、皮疹），再结合档案里的年龄体重和在服药物回答，
+  最后给出一张可以带走的就诊摘要。</p>
+  <p><b>场景三：复诊前一晚。</b>用户点开"病程时间轴"，把这三个月发生的事排成一条轴：
+  哪天开始吃药、聊过几次、结论卡片写了什么。点"投影视图"，铺成一张白纸，截图或打印，
+  第二天直接给医生看 —— 不用再凭记忆复述。</p>
+  <p class="small">
+    三个场景都发生在手机上，而且经常是"一只手、几秒钟、注意力被打断"的状态。
+    这直接约束了设计：主操作必须在首屏一次点击内完成；文字要大到在油烟和昏暗里也能读；
+    动画必须能在中低端安卓机上跑得动（见 7.4 性能取舍）。
+  </p>
+</section>
+
+<!-- ============ 02 ============ -->
+<section>
+  <h2>02　需求分析</h2>
+
+  <h3>2.1 五类真实问题</h3>
+  <table>
+    <tr><th style="width:20%">问题</th><th style="width:38%">现实里的样子</th><th>我们的做法</th></tr>
+    <tr>
+      <td><b>吃了没记</b></td>
+      <td>"今天这顿到底吃没吃"—— 老人记不清，子女问不出来，重复服药风险由此产生</td>
+      <td>天上那块木牌：全家今天的用药一屏看完，<b>每一行就是打卡按钮</b>，点一下记为已服、再点撤销，
+          行内状态与板面文字同时变</td>
+    </tr>
+    <tr>
+      <td><b>该不该去医院</b></td>
+      <td>胸痛、呼吸困难、意识不清这类信号，被"再观察观察"耽误；反过来，普通感冒又容易过度就医</td>
+      <td>红旗症状交给<b>本地规则</b>而不是模型：11 条正则命中即中断问诊，画成红卡片并落库，
+          刷新之后还是红的</td>
+    </tr>
+    <tr>
+      <td><b>说不清病史</b></td>
+      <td>复诊三分钟，医生说"上次那个药还吃着吗"，患者答不上来</td>
+      <td>把档案、在服药物、最近 3 次问诊摘要、8 条结论拼成个体化提示词；并把一次问诊整理成
+          <b>可打印的就诊摘要</b></td>
+    </tr>
+    <tr>
+      <td><b>听不懂医嘱</b></td>
+      <td>"窦性心律""幽门螺旋杆菌"—— 名词听懂了，但不知道该做什么检查、什么说法是谣言</td>
+      <td>内置 <b>90 条疾病 + 73 种药品</b>科普，疾病详情里专门有"去医院一般会做哪些检查"和
+          "流传很广，但不对"两节</td>
+    </tr>
+    <tr>
+      <td><b>既想共享又怕泄露</b></td>
+      <td>全家人的健康数据放在一个 App 里，谁都能看，等于没有隐私</td>
+      <td>一个账号多份档案，所有读写都用 <code>ownerId</code> 在一条 SQL 里挡掉越权；
+          别人的档案和不存在返回同一个 404</td>
+    </tr>
+  </table>
+
+  <h3>2.2 功能需求</h3>
+  <p>
+    上面五类问题拆成 6 组功能需求。优先级里 P0 是"不做就等于没做"，
+    P1 是"没有它产品不完整"，P2 是"有更好"。
+  </p>
+  <table>
+    <tr><th style="width:12%">编号</th><th style="width:20%">功能组</th><th style="width:12%">优先级</th><th>具体要求</th></tr>
+    <tr><td>FR-1</td><td>账号与数据隔离</td><td class="c">P0</td>
+        <td>注册 / 登录 / 登出；一个账号管多份家庭档案；跨账号的任何读写都必须返回 404 而非 403</td></tr>
+    <tr><td>FR-2</td><td>家庭档案</td><td class="c">P0</td>
+        <td>姓名、关系、生日、身高体重、过敏史、既往史、主诉；可编辑、可删除；支持头像</td></tr>
+    <tr><td>FR-3</td><td>用药与打卡</td><td class="c">P0</td>
+        <td>用药计划（药名、剂量、频次、起止日期）；今日待服清单；打卡与撤销；全家用药板一屏呈现</td></tr>
+    <tr><td>FR-4</td><td>AI 问诊</td><td class="c">P0</td>
+        <td>流式对话；回答必须结合档案与在服药物；高危症状必须被拦截并给出就医指引；不出现诊断与处方</td></tr>
+    <tr><td>FR-5</td><td>科普库</td><td class="c">P1</td>
+        <td>疾病与药品检索；疾病含检查项目与常见误区；药品含起效时间、漏服处理、储存条件</td></tr>
+    <tr><td>FR-6</td><td>就诊材料</td><td class="c">P1</td>
+        <td>病程时间轴；就诊摘要（可打印、可复制纯文本）；复诊日历</td></tr>
+    <tr><td>FR-7</td><td>资料上传</td><td class="c">P2</td>
+        <td>化验单 / 处方照片 / PDF / Word 上传；本地 OCR；文本可作为对话附件上下文</td></tr>
+  </table>
+
+  <h3>2.3 非功能需求</h3>
+  <table>
+    <tr><th style="width:16%">维度</th><th style="width:30%">指标</th><th>怎么落地</th></tr>
+    <tr><td>响应速度</td><td>首屏可交互 &lt; 2.5s（4G 中端机）；红旗判断 &lt; 200ms</td>
+        <td>3D 模型加载前有程序化占位体；红旗规则纯本地正则，不经网络与模型</td></tr>
+    <tr><td>渲染性能</td><td>移动端稳定 30fps 以上</td>
+        <td>草用实例化渲染（一次 draw call 画 6 万株）；<code>devicePixelRatio</code> 封顶 1.5</td></tr>
+    <tr><td>安全</td><td>密码不可逆、会话可验签、上传不可执行</td>
+        <td>scrypt 加盐哈希；HMAC 签名 Cookie；上传只校验文件头魔数，文件名由服务端生成</td></tr>
+    <tr><td>隐私</td><td>健康数据不外泄，对话不长期留存</td>
+        <td>数据隔离在 SQL 层完成；对话原文 30 天清理；密钥只在服务端环境变量</td></tr>
+    <tr><td>合规</td><td>不诊断、不开方、不替代面诊</td>
+        <td>系统提示词硬约束 + 每条科普页固定"科普不替代面诊" + 红旗强制转诊</td></tr>
+    <tr><td>可维护</td><td>换模型 / 换数据库不改业务代码</td>
+        <td>AI 收敛在 <code>lib/ai.ts</code> 一层；数据层换 <code>DATABASE_URL</code> 即可切 Postgres</td></tr>
+    <tr><td>可部署</td><td>断网环境可独立运行</td>
+        <td>字体、模型、OCR 语言包全部本地化，无第三方 CDN 依赖；47MB 离线包解压即跑</td></tr>
+  </table>
+</section>
+
+<!-- ============ 03 ============ -->
+<section>
+  <h2>03　系统架构设计</h2>
+
+  <h3>3.1 总体架构</h3>
+  <p>
+    整体是"单页壳 + 服务端路由 + 一层 AI 适配"的结构。浏览器侧只有一片草地和一个问诊面板，
+    状态集中在 <code>MeadowStage.tsx</code>；服务端 23 个 API 路由按
+    <b>"校验输入 → 认门 → 查配置 → 干活"</b>的固定顺序处理，任何一步不过就直接返回。
+  </p>
+
+  <div class="arch">
+    <div class="arch__row">
+      <div class="arch__label">表现层</div>
+      <div class="arch__box">
+        <b>3D 草地场景</b>（Three.js：地形 / 6 万株实例草 / 绒球医生 / 木牌）
+        ＋ <b>档案栏</b> ＋ <b>问诊面板</b> ＋ <b>科普库</b><br />
+        文字贴片用单应矩阵每帧投影到木牌四角，真字体、任意缩放不糊
+      </div>
+    </div>
+    <div class="arch__arrow">↓ 同源 fetch，SSE 流式回传</div>
+    <div class="arch__row">
+      <div class="arch__label">接口层</div>
+      <div class="arch__box">
+        23 个 Route Handler：<code>/api/auth</code> · <code>/api/patients</code> ·
+        <code>/api/medications</code> · <code>/api/consultations</code> ·
+        <code>/api/attachments</code> · <code>/api/notes</code> · <code>/api/growth</code><br />
+        统一入口守卫 <code>requireUser()</code>，所有查询强制带 <code>ownerId</code>
+      </div>
+    </div>
+    <div class="arch__arrow">↓</div>
+    <div class="arch__row">
+      <div class="arch__label">领域层</div>
+      <div class="arch__box">
+        <b>规则引擎</b>（<code>red-flags.ts</code> 11 条）·
+        <b>提示词装配</b>（<code>medical-prompt.ts</code>）·
+        <b>事实核对</b>（<code>facts.ts</code>）·
+        <b>排程与依从性</b>（<code>medication-schedule.ts</code>）·
+        <b>摘要生成</b>（<code>visit-sheet.ts</code>，纯函数）
+      </div>
+    </div>
+    <div class="arch__arrow">↓</div>
+    <div class="arch__row">
+      <div class="arch__label">AI 适配层</div>
+      <div class="arch__box arch__box--ai">
+        <b><code>lib/ai.ts</code></b>：OpenAI 兼容协议封装 · 流式与非流式共用一条通路 ·
+        90 秒首包超时 · 换厂商只改环境变量<br />
+        业务代码不直接 <code>fetch</code> 模型，这一层是唯一的出口
+      </div>
+    </div>
+    <div class="arch__arrow">↓</div>
+    <div class="arch__row">
+      <div class="arch__label">数据层</div>
+      <div class="arch__box arch__box--data">
+        <b>Prisma 6 + SQLite</b>（WAL / busy_timeout=5s / 连接池 1）·
+        本地磁盘存附件与头像 ·
+        <code>schema.postgres.prisma</code> 已备好，换库只改连接串
+      </div>
+    </div>
+  </div>
+
+  <h3>3.2 技术栈与选型理由</h3>
+  <table>
+    <tr><th style="width:18%">层</th><th style="width:28%">选型</th><th>为什么是它</th></tr>
+    <tr><td>框架</td><td>Next.js 16（App Router）+ React 19 + TypeScript 5.9</td>
+        <td>同一仓库里既有服务端取数也有客户端交互；Server Component 让档案数据在服务端就按 ownerId 过滤完，不下发整表</td></tr>
+    <tr><td>样式</td><td>Tailwind 4 + 手写 CSS 变量</td>
+        <td>3D 转场、木牌投影这类效果需要精确的时间轴和矩阵，纯原子类反而难写</td></tr>
+    <tr><td>3D</td><td>Three.js 0.170（自写 engine.js）</td>
+        <td>草地是实例化渲染 + 顶点着色器风摆，通用编辑器做不出来也带不动</td></tr>
+    <tr><td>数据</td><td>Prisma 6 + SQLite</td>
+        <td>单机自用场景零运维；换成 Postgres 只需改 DATABASE_URL</td></tr>
+    <tr><td>模型</td><td>DeepSeek（OpenAI 兼容协议）</td>
+        <td>中文问诊语境好、流式便宜；封装层不绑定厂商，换模型只改环境变量</td></tr>
+    <tr><td>认证</td><td>Node 内置 crypto（scrypt）+ HMAC Cookie</td>
+        <td>不引认证库，少一个供应链风险；逻辑不到 200 行，可逐行审</td></tr>
+    <tr><td>OCR</td><td>tesseract.js + 本地中文语言包</td>
+        <td>化验单不该上传到第三方识别服务；语言包随仓库走，断网可用</td></tr>
+  </table>
+
+  <h3>3.3 模块划分</h3>
+  <table>
+    <tr><th style="width:32%">模块</th><th>职责</th></tr>
+    <tr><td><code>lib/auth.ts</code></td><td>scrypt 加盐哈希、HMAC 会话、<code>requireUser()</code></td></tr>
+    <tr><td><code>lib/medical-prompt.ts</code></td><td>把档案 / 在服药物 / 摘要 / 结论拼成个体化 System Prompt，带三个 token 上限</td></tr>
+    <tr><td><code>lib/red-flags.ts</code></td><td>11 条红旗症状正则，命中即中断，不经过模型</td></tr>
+    <tr><td><code>lib/facts.ts</code></td><td><code>diffFacts()</code> 用代码判定冲突，<code>applyFacts()</code> 重新校验后落库</td></tr>
+    <tr><td><code>lib/visit-sheet.ts</code></td><td>就诊摘要的结构、清洗、本地模板与纯文本版（纯函数，无副作用）</td></tr>
+    <tr><td><code>lib/medication-schedule.ts</code></td><td>排程展开与依从性计算，漏服封顶 7 天</td></tr>
+    <tr><td><code>lib/knowledge-search.ts</code></td><td>中文检索：归一化 + 多词 AND + 字段权重打分</td></tr>
+    <tr><td><code>components/meadow/engine.js</code></td><td>3D 场景：地形、实例草、绒球医生、木牌布局与投影</td></tr>
+    <tr><td><code>lib/ai.ts</code></td><td>模型调用的唯一出口</td></tr>
+  </table>
+
+  <h3>3.4 数据模型</h3>
+  <table>
+    <tr><th style="width:20%">表</th><th style="width:34%">关键字段</th><th>说明</th></tr>
+    <tr><td>User</td><td>email · passwordHash</td><td>账号，所有数据的根</td></tr>
+    <tr><td>Patient</td><td>name · gender · birthday · allergy · history · chiefComplaint</td><td>家庭档案，一个账号可多份</td></tr>
+    <tr><td>Medication</td><td>name · dose · frequency · startDate · isActive · reminderAt</td><td>在服药物与提醒时间</td></tr>
+    <tr><td>CheckIn</td><td>medicationId · dateKey · takenAt</td><td>一天一次打卡，(medicationId, dateKey) 唯一，重复打卡幂等</td></tr>
+    <tr><td>Consultation</td><td>status · lastMessageAt · summary</td><td>一次问诊会话，关闭时归档</td></tr>
+    <tr><td>Message</td><td>role · content · flag · attachmentId</td><td>红旗消息把 <code>redflag.&lt;kind&gt;</code> 写进 flag，刷新后仍红</td></tr>
+    <tr><td>Note</td><td>content · starred</td><td>结论卡片，只有患者能建</td></tr>
+    <tr><td>Attachment</td><td>path · mime · size</td><td>化验单 / 处方照片，30 天清理</td></tr>
+  </table>
+</section>
+
+<!-- ============ 04 ============ -->
+<section>
+  <h2>04　AI 技术方案</h2>
+
+  <h3>4.1 选型理由</h3>
+  <p>
+    这一层是本作品权重最高的部分，也是做取舍最多的地方。三个选题决定了技术路线：
+    <b>要不要微调</b>、<b>要不要向量库</b>、<b>要不要 Agent 框架</b>。
+  </p>
+
+  <h4>（1）为什么用提示词个体化，而不是微调</h4>
+  <p>
+    微调适合"改变说话风格与任务格式"，不适合"让模型知道某个具体患者的过敏史"。
+    后者属于事实注入，用提示词就能做到，而且<b>改了立刻生效</b> ——
+    患者今早刚加的青霉素过敏，下午的对话就必须带上，微调模型做不到这个时效。
+    另外微调需要构建数据集并承担训练成本，一个家庭的数据量根本不支持。
+    所以路线是：<em>通用模型 + 结构化事实装配 + 硬约束提示词</em>。
+  </p>
+
+  <h4>（2）为什么没上向量 RAG</h4>
+  <p>
+    科普库是 90 条疾病 + 73 种药品的<b>结构化条目</b>，不是长文档。
+    这类语料的关键是"准确命中条目"，而中文病名的检索难点在别名与错别字
+    （"胃食管反流"与"烧心"、"甲亢"与"甲状腺功能亢进"），不在语义近似。
+    我们用"全半角与简繁归一 + 同义词映射 + 多词 AND + 字段权重打分"解决了命中问题：
+    病名权重高于症状描述，命中病名即置顶。<em>零依赖、可解释、结果稳定</em>,
+    比引入 embedding 模型和向量库更划算 —— 后者还会带来一个几百 MB 的运行时依赖，
+    与"离线可部署"这条非功能需求冲突。
+  </p>
+  <div class="note">
+    <b>这一点在文档里说清楚，比含糊地说"实现了 RAG"更重要。</b>
+    我们没有做向量检索，做的是检索增强的关键词方案；检索结果作为事实注入提示词，
+    模型在此基础上组织语言。它的增强效果来自"命中准"，而不是"语义泛化"。
+  </div>
+
+  <h4>（3）为什么不用 Agent 框架</h4>
+  <p>
+    问诊是<b>线性对话</b>，不需要多步规划与自主决策。引入 Agent 框架会带来两个风险：
+    一是模型可能自行决定"再问一轮"或"直接给结论"，行为不可预测；
+    二是每一轮工具调用都增加延迟与费用，而用户是在深夜着急地问"要不要去医院"。
+    我们选择把"决策"写成确定性代码（红旗规则、冲突判定、排程），
+    只在"组织语言"这一步交给模型 —— <em>慢的地方必须快，不确定的地方必须确定</em>。
+  </p>
+
+  <h3>4.2 集成方式</h3>
+  <table>
+    <tr><th style="width:24%">环节</th><th>做法</th></tr>
+    <tr><td>调用位置</td><td>只在服务端。密钥存在 <code>.env</code> 的 <code>DEEPSEEK_API_KEY</code>，浏览器永远拿不到</td></tr>
+    <tr><td>协议</td><td>OpenAI 兼容的 <code>/chat/completions</code>，<code>stream: true</code>；服务端转成 SSE 推给前端</td></tr>
+    <tr><td>封装</td><td><code>lib/ai.ts</code> 抽出 <code>postChat()</code>，流式与一次性调用共用；换厂商只改 baseURL 与 model</td></tr>
+    <tr><td>失败处理</td><td>先调模型，流读完且内容非空，才把提问和回答<b>一起</b>写库；Key 错、上游 500、网络断都不会攒出"只有提问没有回答"的记录</td></tr>
+    <tr><td>降级</td><td>无 Key 时 <code>MEDAI_DEMO_AI=1</code> 走本地模拟流，协议与真实调用一致，全链路可演练；就诊摘要另有本地模板兜底，<b>绝不空手</b></td></tr>
+  </table>
+
+  <h3>4.3 提示词工程</h3>
+  <p>
+    每次对话前拼四样东西：① 档案（年龄、体型、血型、过敏史、病史、习惯、主诉）
+    ② 在服药物 ③ 最近 3 条问诊摘要 ④ 星标优先的 8 条结论。
+    这四块各自有 token 上限，总量恒定，<b>不会随对话变长而失控</b>；
+    超出上限时按"过敏史 &gt; 主诉 &gt; 在服药物 &gt; 摘要 &gt; 结论"的顺序裁剪，把最后的位置留给最重要的信息。
+  </p>
+  <p>
+    <b>医疗合规三件套永远在场</b>：不下诊断、不开处方；过敏史优先考虑并主动提醒；
+    涉及处方药必须提示遵医嘱。这三条写在系统提示词最前面，并且不参与裁剪。
+  </p>
+
+  <h3>4.4 优化策略</h3>
+  <table>
+    <tr><th style="width:26%">优化点</th><th style="width:30%">做法</th><th>效果</th></tr>
+    <tr><td>规则前置，先拦后问</td><td>红旗症状在调模型<b>之前</b>用本地正则判定</td>
+        <td>拦截耗时 126ms，走模型 1646ms；省一次调用，且模型挂了这条生命线照样生效</td></tr>
+    <tr><td>首包超时而非全程超时</td><td>只给"建连 + 首包"设 90 秒上限，拿到响应头就撤计时器</td>
+        <td>话多的正常回答不会被从中间掐断；网络卡死时又不会无限等</td></tr>
+    <tr><td>流式渲染</td><td>SSE 逐块推，前端边收边画</td>
+        <td>首字出现时间从数秒降到 1 秒内，长回答的体感差异明显</td></tr>
+    <tr><td>本地能力不上云</td><td>红旗判定、排程计算、科普检索、OCR 全在本地</td>
+        <td>这三类调用量最大，本地化后不产生费用，也不受上游可用性影响</td></tr>
+    <tr><td>事实核对人工闭环</td><td>模型只返回候选事实，一个字不写库；冲突项默认不勾选并红色高亮</td>
+        <td>避免模型"顺着用户说"污染档案，同时把确认成本降到一次点击</td></tr>
+  </table>
+
+  <h3>4.5 AI 安全与可控</h3>
+  <h4>（1）红旗症状不走模型</h4>
+  <p>
+    11 条规则覆盖胸痛、言语不清、抽搐、意识改变、大出血、呼吸困难、高热伴皮疹等急症表述。
+    命中即中断常规回答，改为固定话术要求立即就医或拨打 120。命中结果写进消息的
+    <code>flag</code> 字段（<code>redflag.&lt;kind&gt;</code>），<b>刷新之后仍然是红的</b> ——
+    安全提示不能被一次页面刷新冲掉。
+  </p>
+  <figure class="fig-mid">
+    <img src="../preview-redflag.png" alt="红旗拦截" />
+    <figcaption>图 2　红旗拦截：命中后不再走常规问诊，改为红卡片强制就医指引</figcaption>
+  </figure>
+
+  <h4>（2）AI 提建议，患者点头</h4>
+  <p>
+    模型只能返回候选事实（可补字段 / 新增用药 / 与档案冲突）。
+    其中 <code>fill</code> 与 <code>add</code> 默认勾选，<code>conflict</code> 默认<b>不</b>勾选并红色高亮，
+    必须患者亲手确认。<b>冲突判定由代码完成，不交给模型</b> —— 让模型判断"新信息与档案是否矛盾"，
+    它容易顺着用户说。落库前每条都当不可信输入重新校验：字段白名单、长度上限、
+    单次 ≤ 20 条、<code>medicationId</code> 按 ownerId 重查。
+  </p>
+  <div class="note">
+    <b>一条自我约束：结论卡片（Note）不许自动生成。</b>
+    客观事实可以让 AI 整理，但"哪句重要"是价值判断 —— 只有患者自己知道。
+    这个取舍让产品少了一个看起来很酷的功能，但保住了"判断权在人手里"这条线。
+  </div>
+</section>
+
+<!-- ============ 05 ============ -->
+<section>
+  <h2>05　核心功能实现</h2>
+
+  <h3>5.1 信息架构</h3>
+  <table>
+    <tr><th style="width:24%">一层</th><th>内容</th></tr>
+    <tr><td>草地（首页）</td><td>家人档案栏 · 今日用药木牌 · 绒球医生 · 疾病科普 / 药品说明两个入口</td></tr>
+    <tr><td>档案详情</td><td>基本信息 · 在服药物 · 结论卡片 · 问诊记录（日历） · 病程时间轴 · 成长记录</td></tr>
+    <tr><td>问诊面板</td><td>流式对话 · 附件（图片/PDF/Word） · 事实核对 · 就诊摘要</td></tr>
+    <tr><td>科普库</td><td>疾病 90 条（13 科室）· 药品 73 种（10 大类）· 症状搜索</td></tr>
+  </table>
+
+  <h3>5.2 视觉与交互基调</h3>
+  <p>
+    医疗类产品的默认语言是"白底 + 蓝 + 表格"，它传达的是准确，但也传达距离感。
+    MedAI 选择的是另一种可信：<b>一片有风的草地、一只毛绒绒的绒球医生、一块手写的木板</b>。
+    颜色取自清晨的草地（<code>#8abfeb</code> 的天空、<code>#2f4a2b</code> 的深绿、奶油色的纸面板），
+    圆角与黏土质感的按钮（<code>.clay</code>）替代了直角卡片。
+    目的很实际：<em>让人愿意在深夜打开它</em>。
+  </p>
+
+  <h4>（1）开场：一株蒲公英</h4>
+  <p>
+    首次进入是一株 186 颗种子的蒲公英（内联 SVG，无图片请求）。吹散之后 3D 草地才显出来 ——
+    这不是装饰，是用 1.2 秒把"这是一片能玩的地方"这件事说清楚。看过一次后写入
+    <code>sessionStorage</code>，返回时在 HTML 解析阶段就打上标记，第一帧直接隐藏，不会闪回开场。
+  </p>
+
+  <h4>（2）点开档案：一场三者同步的转场</h4>
+  <p>
+    点一份档案，球向右滚 90°、抬头、缩小，左栏左滑消失，问诊面板从右滑到中间 ——
+    三者共用一条 <code>--flow: 1100ms</code> 的时间轴，同一刻停下，球正好趴在面板上边缘。
+    球的落点不是写死的坐标，而是把面板的 <code>offsetLeft/offsetTop</code> 反投影回 3D 世界算出来的，
+    换分辨率、换布局都准。转场进度用<b>墙钟</b>计算而不是累加 <code>dt</code>：低帧率设备上
+    <code>dt</code> 会被钳到 0.05，那样 1.1 秒会被拖成两三秒，球就和面板错开了。
+  </p>
+
+  <h4>（3）木牌打卡：把"记录"压缩成一个动作</h4>
+  <p>
+    木牌最初只是"看"的 —— 看全家今天吃到哪了。但看和记之间隔着一个二级页面，
+    而真实场景里用户根本没空跳转。所以现在卡片里<b>每一行药就是按钮</b>：
+    点一下调打卡接口，成功后重新拉取整块板子，行内状态、表头计数（2/5 → 3/5）、
+    3D 板面上的字三处同时更新。
+  </p>
+  <figure>
+    <img src="../preview-signboard-checkin.png" alt="木牌打卡" />
+    <figcaption>图 3　点一下木板，卡片从板子下面长出来；点行即打卡，三处状态同步</figcaption>
+  </figure>
+  <p class="small">
+    这里有个细节值得一提：打卡后同一个人的名字可能因为排序变化而移动，用户会点错行。
+    所以卡片打开时会把人名顺序<b>冻结</b>下来，打卡只改状态、不重排。
+  </p>
+
+  <h4>（4）就诊摘要：能带走的那张纸</h4>
+  <p>
+    问诊结束后可以整理成一张 A4 纸：主诉 / 病程 / 在服药与过敏史 / 现在可以先做的 / 何时必须就医 /
+    想问医生什么。它单独重排了字号和版式（不依赖 flex、色块用真边框），
+    用任何工具转 PDF 都不容易变形；同时提供纯文本版，复制到微信里也不会丢掉过敏史。
+  </p>
+  <figure class="fig-half">
+    <img src="../preview-sheet.png" alt="就诊摘要" />
+    <figcaption>图 4　就诊摘要：A4 单页，可打印为 PDF，也可复制成纯文本</figcaption>
+  </figure>
+
+  <h3>5.3 开发过程</h3>
+  <p>
+    项目按"能用 → 好用 → 敢交"三段推进，每一轮都以"自检脚本全绿 + 真实截图"收尾。
+    代码按模块分 18 次提交入库，提交信息记录每次改了什么、为什么改。
+  </p>
+  <table>
+    <tr><th style="width:16%">阶段</th><th style="width:42%">做了什么</th><th>为什么这一步重要</th></tr>
+    <tr><td>第 1 周</td><td>账号体系、档案增删改查、问诊流式对话、AI 提示词装配</td><td>先把"能不能用"跑通，此时界面还很朴素</td></tr>
+    <tr><td>第 2 周</td><td>3D 草地（实例化草、风摆、绒球医生）、蒲公英开场、点档案的转场</td><td>产品第一次有了"愿意打开"的理由</td></tr>
+    <tr><td>第 3 周</td><td>红旗症状本地规则、事实核对、就诊摘要、问诊日历</td><td>把 AI 从"聊天"变成"有边界的工具"</td></tr>
+    <tr><td>第 4 周</td><td>用药提醒、木牌、病程时间轴、疾病/药品科普库</td><td>覆盖"吃、看、说"三个真实动作</td></tr>
+    <tr><td>第 5 周</td><td>木牌上直接打卡、404/错误页、演示入口、打包与离线部署</td><td>从"能演示"走到"能交付"</td></tr>
+  </table>
+
+  <h3>5.4 三个修得比较深的问题</h3>
+  <h4>（1）低帧率设备上，转场会错位</h4>
+  <p>
+    最初转场进度是把每帧 <code>dt</code> 累加。但引擎里 <code>dt</code> 被钳到 0.05，
+    30fps 的机器上 1.1 秒的动画会被拖成两三秒，球和面板就错开了。
+    改成用墙钟计算进度后，无论多少帧，三者都在同一刻停。
+  </p>
+  <h4>（2）窄屏切回桌面，木牌停在半空</h4>
+  <p>
+    木牌的横向位置取自左栏 <code>.records</code> 的右边界，纵向靠相机反投影。
+    <code>resize</code> 那一帧里，左栏还是手机版宽度、相机还在插值 —— 两个输入都是旧的，板子就摆错了地方。
+    修法是在 resize 后记一个 1.4 秒的重排倒计时，逐帧重摆，等 CSS 和相机都落定。
+    这条后来写成了回归断言（切回桌面木牌必须回到原位，误差 &lt; 24px）。
+  </p>
+  <h4>（3）打包漏掉了 <code>.next/node_modules</code></h4>
+  <p>
+    分发包解压后 <code>next start</code> 报 <code>Cannot find module</code>。
+    原因是排除规则里的 <code>node_modules</code> 把 <code>.next/node_modules</code> 整棵剪掉了 ——
+    那是 Turbopack 给 <code>serverExternalPackages</code> 留的入口（一堆符号链接）。
+    改法：只剪项目根下的 <code>node_modules</code>，并让遍历跟随符号链接。
+    这个坑只在"真的解压、真的启动"时才暴露，也是后来坚持做解压验收的原因。
+  </p>
+</section>
+
+<!-- ============ 06 ============ -->
+<section>
+  <h2>06　创新点说明</h2>
+
+  <h3>6.1 技术创新点</h3>
+  <p>
+    四条，共同点是<b>把"该确定的"从模型手里拿回来</b>，只在模型擅长的地方用它。
+  </p>
+  <table>
+    <tr><th style="width:24%">创新点</th><th style="width:34%">通行做法</th><th>我们的做法</th></tr>
+    <tr>
+      <td><b>T1　红旗症状不走模型</b></td>
+      <td>把"是否紧急"也交给大模型判断，靠提示词约束</td>
+      <td>11 条本地正则规则先判，命中即中断问诊并落库。实测拦截 126ms，走模型 1646ms；
+          模型挂了也不影响这条生命线</td>
+    </tr>
+    <tr>
+      <td><b>T2　冲突判定用代码，不用模型</b></td>
+      <td>让模型自己判断"新信息和档案是否矛盾"，容易顺着用户说</td>
+      <td><code>diffFacts()</code> 做字段级比对，冲突项默认不勾选、必须人工确认；模型只负责抽取</td>
+    </tr>
+    <tr>
+      <td><b>T3　3D 木牌上贴真字体</b></td>
+      <td>把文字烘成贴图，缩放就糊；或者干脆用一块 HTML 浮层假装</td>
+      <td>板面文字是 HTML，每帧用单应矩阵贴到板子四角 —— 真字体、任意缩放不糊，
+          还能被子遮挡、跟着板子摆</td>
+    </tr>
+    <tr>
+      <td><b>T4　提醒有两条通道</b></td>
+      <td>只依赖系统通知，用户一拒权限功能就废了</td>
+      <td>先让兔子在草地上说一句、蹦一下，有权限再补一条系统通知；人不在页面上时那句话会存着，回来补上</td>
+    </tr>
+  </table>
+
+  <h3>6.2 应用创新点</h3>
+  <p>
+    三条，共同点是<b>把一个动作的完成成本压到最低</b>，而不是增加功能数量。
+  </p>
+  <table>
+    <tr><th style="width:24%">创新点</th><th style="width:34%">通行做法</th><th>我们的做法</th></tr>
+    <tr>
+      <td><b>A1　打卡压缩到"一行一次点击"</b></td>
+      <td>提醒 → 跳详情页 → 找到那颗药 → 点"已服用"</td>
+      <td>木牌卡片里每行就是按钮，不进二级页面；打卡后行、表头、3D 板面三处同步。
+          厨房里一只手也能完成</td>
+    </tr>
+    <tr>
+      <td><b>A2　把问诊变成一张能带走的纸</b></td>
+      <td>聊完就结束，复诊时患者凭记忆复述</td>
+      <td>就诊摘要按 A4 重排版式，可直接打印或复制纯文本；病程时间轴还能铺成投影视图给医生看</td>
+    </tr>
+    <tr>
+      <td><b>A3　一个账号管全家，且互不可见</b></td>
+      <td>要么一人一号（老人不会注册），要么全部可见（没有隐私）</td>
+      <td>一个账号多份档案，越权在 SQL 层挡掉；别人的档案与不存在的档案返回同一个 404，
+          连"这个 id 存不存在"都问不出来</td>
+    </tr>
+  </table>
+
+  <h3>6.3 与同类作品 / 产品的差异</h3>
+  <p>
+    大部分健康类作品的重心在"功能数量"，MedAI 的重心在<b>"一个动作的完成度"</b>：
+    打卡是两个动作、问诊是一次点击、复诊材料是一张能打印的纸。
+    另一条差异是<b>边界感</b>：不诊断、不开方、不替用户判断"哪句重要"，
+    把 AI 放在"整理和翻译"的位置上 —— 这既是合规要求，也是这类产品能长期被信任的前提。
+  </p>
+  <figure class="fig-mid">
+    <img src="../preview-sign-closeup.png" alt="木牌特写" />
+    <figcaption>图 5　木牌特写：文字是真字体而非贴图，放大后边缘依然锐利</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 07 ============ -->
+<section>
+  <h2>07　测试与部署</h2>
+
+  <h3>7.1 自检体系</h3>
+  <p>
+    项目没有引入测试框架，但有<b>一套可重复执行的自检脚本</b>，覆盖接口、规则、渲染与交互，
+    每次改动后跑一遍，输出通过 / 失败计数。当前状态：
+  </p>
+  <table>
+    <tr><th style="width:34%">脚本</th><th class="c" style="width:14%">项数</th><th>覆盖什么</th></tr>
+    <tr><td><code>scripts/api-test.ts</code></td><td class="c">68</td><td>注册登录、越权、档案 CRUD、用药、问诊、事实核对、附件</td></tr>
+    <tr><td><code>scripts/check-board.mjs</code></td><td class="c">33</td><td>木牌位置、卡片明细、打卡与撤销、三处同步、resize 回归、移动端</td></tr>
+    <tr><td><code>scripts/check-reminder.mjs</code></td><td class="c">20</td><td>提醒时间计算、免打扰、漏服封顶、文案</td></tr>
+    <tr><td><code>scripts/check-login.mjs</code></td><td class="c">18</td><td>登录只有邮箱一条路、Cookie、越权拒绝</td></tr>
+    <tr><td><code>scripts/check-entry.mjs</code></td><td class="c">8</td><td>中文 404、错误页出口、演示入口一步进入</td></tr>
+    <tr><td><code>scripts/knowledge-test.ts</code></td><td class="c">—</td><td>90 条疾病 + 73 种药品的字段完整性与搜索命中（同义词归一）</td></tr>
+    <tr><td><code>tsc --noEmit</code> / <code>eslint .</code></td><td class="c">0 错误</td><td>类型与规范</td></tr>
+  </table>
+  <p class="small">
+    交付前不看清单看行为：解压到独立目录 → <code>npm ci</code> → <code>prisma generate</code> →
+    <code>db push</code> → 起服务 → 跑一遍登录、建档、加药、打卡、科普库。
+    只有这一遍走通了才算"能交付"。
+  </p>
+
+  <h3>7.2 安全与隐私</h3>
+  <ul>
+    <li>密码 scrypt 加盐哈希；会话是 HMAC 签名的 7 天 Cookie，服务端不存 session 表。</li>
+    <li>所有读写用一条语句挡越权（<code>findFirst({ where: { id, ownerId } })</code>），
+        不做"先查再比对"，避免从响应差异确认某个 id 是否存在。</li>
+    <li>上传只校验文件头魔数（PNG / JPEG / GIF / WebP），文件名由服务器 <code>randomUUID</code> 生成，不采信用户文件名。</li>
+    <li>登录限流：按 IP 8 次 / 按账号 5 次，每 15 分钟；<b>成功登录会把计数清零</b>，正常用户不会被误锁。</li>
+    <li>对话原文保留 30 天，到期清理；小结与结论卡片不受影响。</li>
+    <li>API 密钥只在服务端环境变量，版本库内不含任何密钥（打包脚本会独立复查一次）。</li>
+  </ul>
+
+  <h3>7.3 部署方案</h3>
+  <table>
+    <tr><th style="width:20%">方式</th><th style="width:32%">适用场景</th><th>步骤</th></tr>
+    <tr><td>本机直跑</td><td>演示、答辩现场（无需外网）</td>
+        <td><code>npm ci</code> → <code>prisma generate</code> → <code>prisma db push</code> → <code>npm start</code>；
+            Windows 双击 <code>Start MedAI.bat</code> 即可，首次运行会自动补齐这四步</td></tr>
+    <tr><td>Docker</td><td>交付给机构、社区医院</td>
+        <td><code>docker compose up -d</code>；多阶段构建，产物只留 standalone 所需文件</td></tr>
+    <tr><td>Caddy 反代</td><td>公网在线演示（可选加分项）</td>
+        <td>Caddy 负责 HTTPS 与反代，容器内只监听内网端口，证书自动申请</td></tr>
+    <tr><td>离线包</td><td>网络受限环境</td>
+        <td>47MB 离线包（含 .next 与 prisma client）解压即跑，无第三方 CDN 依赖</td></tr>
+  </table>
+  <p class="small">
+    数据备份用 <code>npm run db:backup</code>：WAL 模式下直接 <code>cp</code> 会漏掉还在
+    <code>-wal</code> 里的数据，所以改用 <code>VACUUM INTO</code> 导出一致性快照，导出后重开校验表存在。
+  </p>
+
+  <h3>7.4 已知取舍（写在明处）</h3>
+  <ul>
+    <li><b>会话无状态</b>：登出会清 Cookie，但旧 token 在到期前仍可用；要做到即时吊销得加黑名单表。</li>
+    <li><b>头像与附件存本地磁盘</b>：单机部署没问题，多实例要换对象存储。</li>
+    <li><b>SQLite 单文件</b>：适合单机自用，并发写多了要换 Postgres（schema 已备好）。</li>
+    <li><b>限流是进程内的</b>：起多实例必须换 Redis，注释里写清了。</li>
+    <li><b>首屏 3D 模型 4.7MB</b>：弱网下兔子会晚出现一两秒，有程序化占位体兜底，不会白屏。</li>
+  </ul>
+</section>
+
+<!-- ============ 08 ============ -->
+<section>
+  <h2>08　总结与展望</h2>
+
+  <h3>8.1 做成了什么</h3>
+  <p>
+    五周时间，做了三件事：<b>一个能管全家的档案容器</b>、<b>一个有边界的 AI 问诊</b>、
+    <b>一个愿意被打开的外壳</b>。前两件是功能，第三件是这类产品能不能被用起来的前提 ——
+    一个需要教三遍才会用的健康 App，老人第二天就不会再点开。
+  </p>
+  <p>
+    技术上最值得记的不是用了什么框架，而是几条约束：
+    安全判断不交给模型、冲突判定不交给模型、结论生成不交给模型。
+    这三条让产品的行为可预测、可解释、可审计，代价是少了几个"看起来很 AI"的功能。
+  </p>
+
+  <h3>8.2 局限</h3>
+  <ul>
+    <li><b>没有真实临床验证</b>：科普内容依据公开诊疗指南与说明书整理，未经过医生评审流程。</li>
+    <li><b>红旗规则覆盖有限</b>：11 条规则能拦住最典型的急症表述，但方言、口语化表达仍可能漏判。</li>
+    <li><b>单机架构</b>：家庭自用足够，机构规模需要换 Postgres 与对象存储。</li>
+    <li><b>AI 回答质量依赖上游模型</b>：提示词能约束边界，但不能保证每句话都准确。</li>
+  </ul>
+
+  <h3>8.3 推广路径</h3>
+  <table>
+    <tr><th style="width:22%">阶段</th><th style="width:30%">对象</th><th>怎么用</th></tr>
+    <tr><td>一、家庭自用</td><td>有慢病老人的家庭、有小孩的家庭</td><td>一个账号管全家，免费；核心价值是"今天吃药了没有"和"这次要不要去医院"</td></tr>
+    <tr><td>二、社区 / 家医签约</td><td>社区卫生服务中心、家庭医生团队</td><td>就诊摘要可以直接作为签约居民的随访材料；医生不用再问一遍用药史</td></tr>
+    <tr><td>三、机构合作</td><td>药企患者服务、慢病管理公司、养老机构</td><td>私有化部署（Docker + SQLite/Postgres），数据不出机构</td></tr>
+  </table>
+
+  <h3>8.4 可持续性</h3>
+  <p>
+    技术上，模型层已经解耦（换厂商只改环境变量），数据层一条 <code>DATABASE_URL</code> 就能切 Postgres，
+    部署有三条路线（本机 / Docker / Caddy 反代）。
+    成本上，单用户每次问诊的模型开销是可控的（历史 20 条 + 摘要 3 条 + 结论 8 条的固定上限），
+    红旗判断、排程、科普检索全部在本地完成，不产生调用费用。
+  </p>
+  <p>
+    更重要的是它足够小：不依赖任何第三方健康数据接口，一个 47MB 的离线包解开就能跑。
+    这意味着它可以被送进网络条件一般的社区医院，而不是只能活在演示视频里。
+  </p>
+  <figure class="fig-mid">
+    <img src="../preview-mobile.png" alt="移动端" />
+    <figcaption>图 6　移动端：主操作在首屏一次点击内完成，文字在油烟与昏暗里也读得清</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 附录 ============ -->
+<section>
+  <h2>附录 A　引用与开源说明</h2>
+
+  <table>
+    <tr><th style="width:28%">名称</th><th style="width:22%">许可 / 性质</th><th>用途</th></tr>
+    <tr><td>Next.js / React</td><td>MIT</td><td>应用框架与渲染</td></tr>
+    <tr><td>Three.js</td><td>MIT</td><td>3D 场景渲染</td></tr>
+    <tr><td>Prisma</td><td>Apache-2.0</td><td>ORM 与迁移</td></tr>
+    <tr><td>Tailwind CSS</td><td>MIT</td><td>样式工具</td></tr>
+    <tr><td>tesseract.js</td><td>Apache-2.0</td><td>化验单 / 处方照片的本地 OCR</td></tr>
+    <tr><td>Nunito</td><td>SIL Open Font License</td><td>界面西文字体</td></tr>
+    <tr><td>DeepSeek API</td><td>商业服务</td><td>问诊对话与摘要生成</td></tr>
+    <tr><td>绒球医生模型</td><td>团队自制 / 待补充授权说明</td><td><code>public/models/rabbit.glb</code>，加载失败时回退到程序化占位模型</td></tr>
+  </table>
+
+  <p class="small">
+    科普内容（90 条疾病、73 种药品）由团队依据公开诊疗指南与药品说明书整理，
+    每条标注来源与整理月份，正文不含任何处方建议，页面底部固定一句"科普不替代面诊"。
+    界面中的插图（18 组科室线稿）为团队自绘 SVG，不含第三方图片素材。
+  </p>
+
+  <h2 style="margin-top:22pt">附录 B　运行方式与演示账号</h2>
+  <table>
+    <tr><th style="width:26%">项目</th><th>说明</th></tr>
+    <tr><td>运行环境</td><td>Node.js ≥ 20；Windows 双击 <code>Start MedAI.bat</code>，
+        或 <code>npm ci &amp;&amp; npx prisma generate &amp;&amp; npx prisma db push &amp;&amp; npm start</code></td></tr>
+    <tr><td>默认端口</td><td>生产 3100（<code>npm start -- -p 3100</code>）；开发 3200</td></tr>
+    <tr><td>演示账号</td><td><code>demo@medai.local</code> / <code>Medai@2026</code>
+        （含 6 份家庭成员档案、在服药物与问诊记录）</td></tr>
+    <tr><td>无 Key 演示</td><td><code>.env</code> 里 <code>MEDAI_DEMO_AI=1</code> 时走本地模拟流，协议与真实调用一致</td></tr>
+    <tr><td>一键体验</td><td><code>MEDAI_DEMO_LOGIN=1</code> 时登录页出现"用演示账号直接进去"</td></tr>
+    <tr><td>环境变量</td><td>见仓库根目录 <code>.env.example</code>，含数据库、会话密钥、模型、保留天数全部配置项</td></tr>
+  </table>
+  <p class="small" style="margin-top:10pt">
+    源码规模：约 2.7 万行（TypeScript / TSX / JS，不含依赖与构建产物）；23 个 API 路由；90 + 73 条科普内容。
+  </p>
+</section>
+
+</body>
+</html>
