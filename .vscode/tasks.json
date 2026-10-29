@@ -1,0 +1,56 @@
+{
+  // 终端 → 运行任务（Ctrl+Shift+B 直接跑默认的那条）
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "web: 开发服务（改代码自动刷新）",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": false,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "group": "web"
+      },
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      // 已经在 3100 上跑着生产包时用这条；要先 npm run build
+      "label": "web: 生产预览（localhost:3100）",
+      "type": "shell",
+      "command": "npx next start -p 3100",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": false,
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "web" },
+      "problemMatcher": []
+    },
+    {
+      "label": "web: 构建生产包",
+      "type": "shell",
+      "command": "npm run build",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": false,
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "web" },
+      "problemMatcher": []
+    },
+    {
+      "label": "web: 类型检查",
+      "type": "shell",
+      "command": "npm run typecheck",
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "shared", "group": "check" },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "web: ESLint",
+      "type": "shell",
+      "command": "npm run lint",
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "shared", "group": "check" },
+      "problemMatcher": ["$eslint-stylish"]
+    }
+  ]
+}

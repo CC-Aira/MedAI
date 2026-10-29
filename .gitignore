@@ -1,0 +1,36 @@
+node_modules/
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+.env
+.env.local
+# SQLite 库本体 + WAL 模式产生的 -wal / -shm + 历史上手工留的 .bak-*
+# 注意用通配 `dev.db*`：写成 `dev.db-*` 会漏掉 `dev.db.bak-20261022` 这种点号命名的
+prisma/dev.db*
+# 容器部署时库落在 ./data 下（见 docker-compose.yml），同样不能进版本库
+data/dev.db*
+# scripts/backup-db.mjs 的产物
+backups/
+public/uploads/*
+!public/uploads/.gitkeep
+
+# 用户上传给 AI 看的资料（病历照片、化验单、PDF），绝不进版本库
+data/uploads/
+# 注意：data/tesseract/chi_sim.traineddata 要保留，那是 OCR 的中文语言包（2.4MB），
+# 带上它才能离线识别，否则首次上传要现去 CDN 下载。
+
+# 打包产物：npm run pack / pack:submission 的输出，
+# 里面含 .next 与 prisma client，属于构建结果而非源码
+dist/
+
+# 构建与运行日志
+*.log
+
+# 本地踩点脚本的中间产物：Chrome 打印 PDF 用的临时用户目录、逐页预览图
+docs/.chrome-doc/
+docs/submission/_*.png
+docs/submission/doc_check.pdf
+
+.DS_Store

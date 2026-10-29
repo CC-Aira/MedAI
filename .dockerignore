@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.vscode
+build.log
+docs
+data/uploads
+public/uploads
+# 数据库的任何衍生文件都不能进镜像：本体、WAL 模式的 -wal/-shm、手工 .bak-*
+# （`prisma/dev.db*` 一次覆盖全部；原来的三条规则漏了 -wal/-shm）
+prisma/dev.db*
+*.md
+!README.md
