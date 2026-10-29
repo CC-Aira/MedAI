@@ -47,7 +47,7 @@
           <Text style={{ fontSize: 13, color: '#7E9470' }}>
             Next.js 16 · React 19 · Three.js · Prisma · SQLite · DeepSeek
           </Text>
-          <Text style={{ fontSize: 13, color: '#7E9470' }}>广东医科大学 · 陈妍萱</Text>
+          <Text style={{ fontSize: 13, color: '#7E9470' }}>广东医科大学 · 陈妍萱 潘思妍</Text>
         </Box>
       </Box>
 

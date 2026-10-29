@@ -56,11 +56,11 @@
         </Box>
         <Box style={{ flexDirection: 'column' }}>
           <Text style={{ fontSize: 13, color: '#7E9470', letterSpacing: 1 }}>团队成员</Text>
-          <Text style={{ fontSize: 19, color: '#E8EFE0', fontWeight: 'bold', marginTop: 4 }}>陈妍萱</Text>
+          <Text style={{ fontSize: 19, color: '#E8EFE0', fontWeight: 'bold', marginTop: 4 }}>陈妍萱 · 潘思妍</Text>
         </Box>
         <Box style={{ flexDirection: 'column' }}>
           <Text style={{ fontSize: 13, color: '#7E9470', letterSpacing: 1 }}>指导教师</Text>
-          <Text style={{ fontSize: 19, color: '#E8EFE0', fontWeight: 'bold', marginTop: 4 }}>待补充</Text>
+          <Text style={{ fontSize: 19, color: '#E8EFE0', fontWeight: 'bold', marginTop: 4 }}>白金山</Text>
         </Box>
       </Box>
     </Box>
