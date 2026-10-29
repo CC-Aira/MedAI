@@ -29,8 +29,12 @@ dist/
 *.log
 
 # 本地踩点脚本的中间产物：Chrome 打印 PDF 用的临时用户目录、逐页预览图
-docs/.chrome-doc/
+**/.chrome-doc/
 docs/submission/_*.png
 docs/submission/doc_check.pdf
 
 .DS_Store
+
+# 演示文稿工具的中间缓存与图片缓存
+.slidep/
+**/.cache/

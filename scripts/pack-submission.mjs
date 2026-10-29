@@ -49,7 +49,9 @@ const FULL_DIRS = ["src", "scripts"];
 const PICKED = {
   prisma: [/^schema.*\.prisma$/, /^seed\.ts$/],
   public: [/^favicon\.svg$/, /^models\//, /^vendor\//],
-  docs: [/^[^_.][^/]*\.md$/, /^submission\/(?!\.)/],
+  // submission 只带顶层文件（PDF / HTML 源 / 脚本），子目录里是 PPT 工程与截图，
+  // 成品已单独放进「提交材料」，不必重复占体积
+  docs: [/^[^_.][^/]*\.md$/, /^submission\/[^/]+\.[a-z]+$/],
 };
 
 /** 根目录散落的文件 */
@@ -73,9 +75,9 @@ const ROOT_FILES = [
 
 /** 提交材料：放好就会自动带进去，缺哪个就提醒哪个 */
 const MATERIALS = [
-  ["作品说明文档.pdf", "作品说明文档（PDF）"],
-  ["演示视频.mp4", "演示视频（≤10 分钟 MP4）"],
-  ["答辩PPT.pptx", "答辩 PPT"],
+  ["技术文档.pdf", "技术文档（PDF，≤30 页）"],
+  ["演示视频.mp4", "演示视频（5–8 分钟，MP4，≥1080p）"],
+  ["MedAI答辩PPT/MedAI答辩PPT.pptx", "答辩 PPT"],
 ];
 
 /* ------------------------------------------------------------ 复制 */
@@ -129,7 +131,7 @@ mkdirSync(matDir, { recursive: true });
 for (const [file] of MATERIALS) {
   const src = path.join(ROOT, "docs", "submission", file);
   if (existsSync(src)) {
-    copyFileSync(src, path.join(matDir, file));
+    copyFileSync(src, path.join(matDir, path.basename(file)));
     count += 1;
   }
 }
