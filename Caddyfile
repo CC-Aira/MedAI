@@ -1,0 +1,16 @@
+# 反向代理 + 自动 HTTPS。
+# 把 medai.example.com 换成自己的域名，并把 DNS A 记录指到这台机器；
+# 没有域名就删掉这个文件、也别开 compose 的 tls profile，直接让 Nginx 反代 3100。
+medai.example.com {
+	encode gzip
+	# 上传病历照片，别让默认的 1MB 卡住
+	request_body {
+		max_size 25MB
+	}
+	reverse_proxy app:3100 {
+		# 流式回答可能跑很久，别提前掐断
+		transport http {
+			read_timeout 300s
+		}
+	}
+}

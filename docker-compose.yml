@@ -1,0 +1,51 @@
+# MedAI —— 单机部署
+#
+#   docker compose up -d --build             # 只起应用（3100），自己套 Nginx
+#   docker compose --profile tls up -d       # 连带 Caddy 一起起（自动 HTTPS，要域名）
+#
+# 数据全在宿主机的 ./data 和 ./public-uploads 里：
+#   ./data/dev.db        SQLite 数据库
+#   ./data/uploads/      用户上传的病历 / 化验单 / PDF
+#   ./public-uploads/    头像
+# 镜像可以随便重建，这三处别删。
+
+services:
+  app:
+    build: .
+    image: medai:latest
+    container_name: medai-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: "file:/app/data/dev.db"
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./data:/app/data
+      - ./public-uploads:/app/public/uploads
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3100/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  # 只有加 --profile tls 才会启动；没有域名就别开
+  caddy:
+    image: caddy:2-alpine
+    container_name: medai-caddy
+    restart: unless-stopped
+    profiles: ["tls"]
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  caddy-data:
+  caddy-config:
