@@ -1,0 +1,116 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#2F4A2B', letterSpacing: 2, fontWeight: 'bold' }}>02　方案</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#2F4A2B' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 24, flexDirection: 'column' }}>
+      <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+        吃、看、说：三个高频动作，各有最短路径
+      </Text>
+      <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6 }}>
+        我们没有按功能列表堆叠，而是先把家庭里真正重复发生的三个动作拆出来，每个动作配一条最省事的路径。
+      </Text>
+
+      <Box style={{ flexDirection: 'row', marginTop: 26, gap: 18, height: 404 }}>
+        <Box style={{
+          flex: 1, background: '#FAF7EF', borderRadius: 6, border: '1px solid #E2DED0',
+          flexDirection: 'column', overflow: 'hidden',
+        }}>
+          <Box style={{ flexDirection: 'row', alignItems: 'center', background: '#2F4A2B', paddingTop: 14, paddingBottom: 14, paddingLeft: 20 }}>
+            <Text style={{ fontSize: 26, fontWeight: 'bold', color: '#FFFFFF', width: 40, fontFamily: 'Microsoft YaHei' }}>吃</Text>
+            <Text style={{ fontSize: 15, color: '#A8C09A', letterSpacing: 1 }}>每天重复四次</Text>
+          </Box>
+          <Box style={{ paddingTop: 16, paddingBottom: 16, paddingLeft: 20, paddingRight: 20, flexDirection: 'column', flex: 1 }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1C1F1A' }}>今天该吃什么、吃了没</Text>
+            <Box style={{ flexDirection: 'column', marginTop: 12, gap: 9 }}>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 用药计划（药名 / 剂量 / 频次 / 疗程）</Text>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 今日待服清单，按人分组</Text>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 木牌上一行一次点击打卡</Text>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 到点提醒：兔子先说，系统再补</Text>
+            </Box>
+          </Box>
+          <Box style={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 16 }}>
+            <Text style={{ fontSize: 14, color: '#2F4A2B', lineHeight: 1.6, fontWeight: 'bold' }}>
+              最短路径：看板 → 点一行，两个动作
+            </Text>
+          </Box>
+        </Box>
+
+        <Box style={{
+          flex: 1, background: '#FAF7EF', borderRadius: 6, border: '1px solid #E2DED0',
+          flexDirection: 'column', overflow: 'hidden',
+        }}>
+          <Box style={{ flexDirection: 'row', alignItems: 'center', background: '#1F3320', paddingTop: 14, paddingBottom: 14, paddingLeft: 20 }}>
+            <Text style={{ fontSize: 26, fontWeight: 'bold', color: '#FFFFFF', width: 40, fontFamily: 'Microsoft YaHei' }}>看</Text>
+            <Text style={{ fontSize: 15, color: '#A8C09A', letterSpacing: 1 }}>每次不确定的时候</Text>
+          </Box>
+          <Box style={{ paddingTop: 16, paddingBottom: 16, paddingLeft: 20, paddingRight: 20, flexDirection: 'column', flex: 1 }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1C1F1A' }}>这算不算严重、要不要去医院</Text>
+            <Box style={{ flexDirection: 'column', marginTop: 12, gap: 9 }}>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 个体化问诊（带档案与在服药物）</Text>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 11 条红旗规则，命中即转诊</Text>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 事实核对：AI 提，患者点头</Text>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 科普库 90 病 + 73 药</Text>
+            </Box>
+          </Box>
+          <Box style={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 16 }}>
+            <Text style={{ fontSize: 14, color: '#2F4A2B', lineHeight: 1.6, fontWeight: 'bold' }}>
+              最短路径：点开一个人，一句话就问
+            </Text>
+          </Box>
+        </Box>
+
+        <Box style={{
+          flex: 1, background: '#FAF7EF', borderRadius: 6, border: '1px solid #E2DED0',
+          flexDirection: 'column', overflow: 'hidden',
+        }}>
+          <Box style={{ flexDirection: 'row', alignItems: 'center', background: '#3A5A34', paddingTop: 14, paddingBottom: 14, paddingLeft: 20 }}>
+            <Text style={{ fontSize: 26, fontWeight: 'bold', color: '#FFFFFF', width: 40, fontFamily: 'Microsoft YaHei' }}>说</Text>
+            <Text style={{ fontSize: 15, color: '#A8C09A', letterSpacing: 1 }}>复诊前那一晚</Text>
+          </Box>
+          <Box style={{ paddingTop: 16, paddingBottom: 16, paddingLeft: 20, paddingRight: 20, flexDirection: 'column', flex: 1 }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1C1F1A' }}>怎么把三个月讲成三分钟</Text>
+            <Box style={{ flexDirection: 'column', marginTop: 12, gap: 9 }}>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 病程时间轴（可投影给医生看）</Text>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 就诊摘要 A4 单页，可打印</Text>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 纯文本版，复制到微信不丢过敏史</Text>
+              <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.5 }}>· 复诊日历与逾期提示</Text>
+            </Box>
+          </Box>
+          <Box style={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 16 }}>
+            <Text style={{ fontSize: 14, color: '#2F4A2B', lineHeight: 1.6, fontWeight: 'bold' }}>
+              最短路径：一张纸，递给医生
+            </Text>
+          </Box>
+        </Box>
+      </Box>
+
+      <Box style={{
+        marginTop: 22, background: '#2F4A2B', borderRadius: 4,
+        paddingTop: 13, paddingBottom: 13, paddingLeft: 24, paddingRight: 24,
+        flexDirection: 'row', alignItems: 'center',
+      }}>
+        <Text style={{ fontSize: 14, color: '#A8C09A', letterSpacing: 2, width: 110 }}>设计原则</Text>
+        <Text style={{ fontSize: 18, color: '#FFFFFF', fontWeight: 'bold', flex: 1 }}>
+          主操作必须在首屏一次点击内完成；只有必须解释的东西，才允许进二级页面。
+        </Text>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>05 / 14</Text>
+    </Box>
+  </Box>
+</Slide>

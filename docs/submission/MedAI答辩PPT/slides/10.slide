@@ -1,0 +1,101 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#2F4A2B', letterSpacing: 2, fontWeight: 'bold' }}>05　核心交互</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#2F4A2B' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 20, flexDirection: 'column' }}>
+      <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+        看得到不等于记得下：每一行就是按钮
+      </Text>
+      <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6 }}>
+        打卡原本要四步：点提醒 → 进档案 → 找到那颗药 → 点已服用。现在压成两步：点木牌 → 点那一行。
+      </Text>
+
+      <Box style={{ flexDirection: 'row', marginTop: 14 }}>
+        <Box style={{ width: 600, flexDirection: 'column' }}>
+          <Image src="assets/signboard.png" style={{ width: 600, height: 452, objectFit: 'cover', borderRadius: 6, border: '1px solid #D8D4C4' }} />
+          <Text style={{ fontSize: 12, color: '#8B8A7E', marginTop: 8, lineHeight: 1.5 }}>
+            图 4　点一下木板，卡片从板子下方长出来；每位家人一段，每颗药一行
+          </Text>
+        </Box>
+
+        <Box style={{ flex: 1, flexDirection: 'column', paddingLeft: 26 }}>
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#2F4A2B', marginBottom: 10 }}>一次点击，三处同时变</Text>
+
+          <Box style={{ flexDirection: 'row', gap: 10 }}>
+            <Box style={{ flex: 1, background: '#FAF7EF', borderRadius: 4, paddingTop: 11, paddingBottom: 11, paddingLeft: 12, paddingRight: 12, flexDirection: 'column' }}>
+              <Text style={{ fontSize: 13, color: '#8ABFEB', fontWeight: 'bold' }}>01</Text>
+              <Text style={{ fontSize: 16, color: '#1C1F1A', fontWeight: 'bold', marginTop: 3 }}>行内状态</Text>
+              <Text style={{ fontSize: 13, color: '#55544A', marginTop: 3 }}>空心圆变成实心打勾</Text>
+            </Box>
+            <Box style={{ flex: 1, background: '#FAF7EF', borderRadius: 4, paddingTop: 11, paddingBottom: 11, paddingLeft: 12, paddingRight: 12, flexDirection: 'column' }}>
+              <Text style={{ fontSize: 13, color: '#8ABFEB', fontWeight: 'bold' }}>02</Text>
+              <Text style={{ fontSize: 16, color: '#1C1F1A', fontWeight: 'bold', marginTop: 3 }}>表头计数</Text>
+              <Text style={{ fontSize: 13, color: '#55544A', marginTop: 3 }}>2/5 变成 3/5</Text>
+            </Box>
+            <Box style={{ flex: 1, background: '#FAF7EF', borderRadius: 4, paddingTop: 11, paddingBottom: 11, paddingLeft: 12, paddingRight: 12, flexDirection: 'column' }}>
+              <Text style={{ fontSize: 13, color: '#8ABFEB', fontWeight: 'bold' }}>03</Text>
+              <Text style={{ fontSize: 16, color: '#1C1F1A', fontWeight: 'bold', marginTop: 3 }}>3D 板面文字</Text>
+              <Text style={{ fontSize: 13, color: '#55544A', marginTop: 3 }}>木板上那行字同步更新</Text>
+            </Box>
+          </Box>
+
+          <Box style={{ flexDirection: 'column', marginTop: 16, gap: 10, flex: 1 }}>
+            <Box style={{ flexDirection: 'row' }}>
+              <Box style={{ width: 4, background: '#2F4A2B', marginRight: 12 }} />
+              <Box style={{ flexDirection: 'column', flex: 1 }}>
+                <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>板面文字是真字体，不是贴图</Text>
+                <Text style={{ fontSize: 15, color: '#55544A', marginTop: 3, lineHeight: 1.5 }}>
+                  文字层是 HTML，每帧用单应矩阵投影到板子四角 —— 任意缩放不糊，还能被子遮挡
+                </Text>
+              </Box>
+            </Box>
+            <Box style={{ flexDirection: 'row' }}>
+              <Box style={{ width: 4, background: '#2F4A2B', marginRight: 12 }} />
+              <Box style={{ flexDirection: 'column', flex: 1 }}>
+                <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>打卡后冻结人名顺序</Text>
+                <Text style={{ fontSize: 15, color: '#55544A', marginTop: 3, lineHeight: 1.5 }}>
+                  否则排序一变，用户就会点到下一行去 —— 打卡只改状态，不重排
+                </Text>
+              </Box>
+            </Box>
+            <Box style={{ flexDirection: 'row' }}>
+              <Box style={{ width: 4, background: '#2F4A2B', marginRight: 12 }} />
+              <Box style={{ flexDirection: 'column', flex: 1 }}>
+                <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>一个跟踪都没有时，板子不消失</Text>
+                <Text style={{ fontSize: 15, color: '#55544A', marginTop: 3, lineHeight: 1.5 }}>
+                  挂一块写着"今天还没有要吃的药"的空板子，点开告诉你怎么用 —— 功能得能被找到
+                </Text>
+              </Box>
+            </Box>
+          </Box>
+
+          <Box style={{
+            marginTop: 14, background: '#1F3320', borderRadius: 4, paddingTop: 11, paddingBottom: 11,
+            paddingLeft: 16, paddingRight: 16,
+          }}>
+            <Text style={{ fontSize: 16, color: '#FFFFFF', fontWeight: 'bold', lineHeight: 1.45 }}>
+              交互创新不在"多一个功能"，而在"把一个动作的完成成本砍到最低"。
+            </Text>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>10 / 14</Text>
+    </Box>
+  </Box>
+</Slide>

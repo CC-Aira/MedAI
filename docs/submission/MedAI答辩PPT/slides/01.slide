@@ -1,0 +1,82 @@
+<Slide style={{ width: 1280, height: 720, background: '#1F3320', padding: 0 }}>
+  <Box style={{ flexDirection: 'row', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 660, height: 720, paddingTop: 66, paddingLeft: 76, paddingRight: 40,
+      flexDirection: 'column', justifyContent: 'space-between', paddingBottom: 60,
+    }}>
+      <Box style={{ flexDirection: 'column' }}>
+        <Text style={{ fontSize: 14, color: '#8FA680', letterSpacing: 2, fontFamily: 'Microsoft YaHei' }}>
+          全国大学生计算机应用能力与数字素养大赛 · 第九届传智杯
+        </Text>
+        <Text style={{ fontSize: 14, color: '#8FA680', letterSpacing: 2, marginTop: 6, fontFamily: 'Microsoft YaHei' }}>
+          AI WEB 网页开发挑战赛 · B 组（本科）
+        </Text>
+
+        <Box style={{ flexDirection: 'row', alignItems: 'center', marginTop: 44 }}>
+          <Box style={{ width: 6, height: 88, background: '#8ABFEB', marginRight: 22 }} />
+          <Box style={{ flexDirection: 'column' }}>
+            <Text style={{ fontSize: 86, fontWeight: 'bold', color: '#FFFFFF', lineHeight: 1.02, fontFamily: 'Microsoft YaHei' }}>
+              MedAI
+            </Text>
+            <Text style={{ fontSize: 28, color: '#C6D8B8', marginTop: 8, fontFamily: 'Microsoft YaHei' }}>
+              草地上的绒球医生
+            </Text>
+          </Box>
+        </Box>
+
+        <Text style={{ fontSize: 18, color: '#9DB08E', marginTop: 30, lineHeight: 1.8 }}>
+          一个账号，管全家人的健康档案。<br />
+          把"该吃什么药、该不该去医院、复诊怎么说"，<br />
+          放进一片能点开的草地。
+        </Text>
+
+        <Box style={{ flexDirection: 'row', marginTop: 34 }}>
+          <Box style={{ flexDirection: 'column', width: 140 }}>
+            <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#8ABFEB', fontFamily: 'Microsoft YaHei' }}>163</Text>
+            <Text style={{ fontSize: 14, color: '#7E9470', marginTop: 3 }}>条科普内容</Text>
+          </Box>
+          <Box style={{ flexDirection: 'column', width: 140 }}>
+            <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#8ABFEB', fontFamily: 'Microsoft YaHei' }}>2.7万</Text>
+            <Text style={{ fontSize: 14, color: '#7E9470', marginTop: 3 }}>行代码</Text>
+          </Box>
+          <Box style={{ flexDirection: 'column', width: 160 }}>
+            <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#8ABFEB', fontFamily: 'Microsoft YaHei' }}>147</Text>
+            <Text style={{ fontSize: 14, color: '#7E9470', marginTop: 3 }}>项自检全绿</Text>
+          </Box>
+        </Box>
+      </Box>
+
+      <Box style={{
+        flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between',
+        borderTop: '1px solid #3C5138', paddingTop: 20,
+      }}>
+        <Box style={{ flexDirection: 'column' }}>
+          <Text style={{ fontSize: 13, color: '#7E9470', letterSpacing: 1 }}>参赛院校</Text>
+          <Text style={{ fontSize: 19, color: '#E8EFE0', fontWeight: 'bold', marginTop: 4 }}>广东医科大学</Text>
+        </Box>
+        <Box style={{ flexDirection: 'column' }}>
+          <Text style={{ fontSize: 13, color: '#7E9470', letterSpacing: 1 }}>团队成员</Text>
+          <Text style={{ fontSize: 19, color: '#E8EFE0', fontWeight: 'bold', marginTop: 4 }}>陈妍萱</Text>
+        </Box>
+        <Box style={{ flexDirection: 'column' }}>
+          <Text style={{ fontSize: 13, color: '#7E9470', letterSpacing: 1 }}>指导教师</Text>
+          <Text style={{ fontSize: 19, color: '#E8EFE0', fontWeight: 'bold', marginTop: 4 }}>待补充</Text>
+        </Box>
+      </Box>
+    </Box>
+
+    <Box style={{ width: 620, height: 720, position: 'relative' }}>
+      <Image src="assets/home.png" style={{ width: 620, height: 720, objectFit: 'cover' }} />
+      <Box style={{
+        position: 'absolute', top: 0, left: 0, width: 200, height: 720,
+        backgroundImage: 'linear-gradient(90deg, #1F3320 0%, rgba(31,51,32,0) 100%)',
+      }} />
+      <Box style={{
+        position: 'absolute', bottom: 40, right: 32, paddingTop: 10, paddingBottom: 10,
+        paddingLeft: 18, paddingRight: 18, background: 'rgba(31,51,32,0.82)', borderRadius: 4,
+      }}>
+        <Text style={{ fontSize: 15, color: '#D8E4CC', letterSpacing: 1 }}>产品实机界面 · 一个账号管六份家庭档案</Text>
+      </Box>
+    </Box>
+  </Box>
+</Slide>

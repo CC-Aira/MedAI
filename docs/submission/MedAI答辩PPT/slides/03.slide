@@ -1,0 +1,104 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#2F4A2B', letterSpacing: 2, fontWeight: 'bold' }}>01　问题</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#2F4A2B' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 34, flexDirection: 'column' }}>
+      <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+        不是没人做，是没人做成一个"全家共用的容器"
+      </Text>
+      <Text style={{ fontSize: 17, color: '#55544A', marginTop: 10 }}>
+        四类现有形态各自解决了一段，但没有一类把"记录、判断、整理"这三件事串起来。
+      </Text>
+
+      <Box style={{ flexDirection: 'row', marginTop: 28, paddingBottom: 10, borderBottom: '2px solid #2F4A2B' }}>
+        <Text style={{ fontSize: 15, color: '#2F4A2B', fontWeight: 'bold', width: 236 }}>现有形态</Text>
+        <Text style={{ fontSize: 15, color: '#2F4A2B', fontWeight: 'bold', width: 400 }}>它做到的</Text>
+        <Text style={{ fontSize: 15, color: '#2F4A2B', fontWeight: 'bold', flex: 1 }}>它缺的那一块</Text>
+      </Box>
+
+      <Box style={{ flexDirection: 'row', paddingTop: 22, paddingBottom: 22, borderBottom: '1px solid #E2DED0' }}>
+        <Box style={{ width: 236, paddingRight: 16 }}>
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#1C1F1A' }}>手机闹钟 / 药盒提醒器</Text>
+          <Text style={{ fontSize: 13, color: '#8B8A7E', marginTop: 4 }}>几十元，最普及</Text>
+        </Box>
+        <Text style={{ fontSize: 17, color: '#55544A', width: 400, paddingRight: 24, lineHeight: 1.6 }}>
+          到点响，便宜、可靠，不需要学习成本
+        </Text>
+        <Text style={{ fontSize: 17, color: '#33352E', flex: 1, lineHeight: 1.6 }}>
+          只知道"该吃药了"，不知道<span style={{ fontWeight: 'bold', color: '#C0473C' }}>谁该吃、吃几片、吃没吃</span>；
+          换个人就全乱
+        </Text>
+      </Box>
+
+      <Box style={{ flexDirection: 'row', paddingTop: 22, paddingBottom: 22, borderBottom: '1px solid #E2DED0' }}>
+        <Box style={{ width: 236, paddingRight: 16 }}>
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#1C1F1A' }}>医院 App / 互联网医院</Text>
+          <Text style={{ fontSize: 13, color: '#8B8A7E', marginTop: 4 }}>数据最权威</Text>
+        </Box>
+        <Text style={{ fontSize: 17, color: '#55544A', width: 400, paddingRight: 24, lineHeight: 1.6 }}>
+          能挂号、能复诊、有电子病历，检查结果可信
+        </Text>
+        <Text style={{ fontSize: 17, color: '#33352E', flex: 1, lineHeight: 1.6 }}>
+          每家医院一套、跨院不通；面向"这一次就诊"，
+          <span style={{ fontWeight: 'bold', color: '#C0473C' }}>不面向"这一年"</span>
+        </Text>
+      </Box>
+
+      <Box style={{ flexDirection: 'row', paddingTop: 22, paddingBottom: 22, borderBottom: '1px solid #E2DED0' }}>
+        <Box style={{ width: 236, paddingRight: 16 }}>
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#1C1F1A' }}>通用 AI 聊天</Text>
+          <Text style={{ fontSize: 13, color: '#8B8A7E', marginTop: 4 }}>门槛最低</Text>
+        </Box>
+        <Text style={{ fontSize: 17, color: '#55544A', width: 400, paddingRight: 24, lineHeight: 1.6 }}>
+          什么都能问，会解释术语，说话像人
+        </Text>
+        <Text style={{ fontSize: 17, color: '#33352E', flex: 1, lineHeight: 1.6 }}>
+          <span style={{ fontWeight: 'bold', color: '#C0473C' }}>没有档案就没有个体化</span>；
+          不知道过敏史和在服药物，建议只能停在科普层面
+        </Text>
+      </Box>
+
+      <Box style={{ flexDirection: 'row', paddingTop: 16, paddingBottom: 14 }}>
+        <Box style={{ width: 236, paddingRight: 16 }}>
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#1C1F1A' }}>健康管理类 App</Text>
+          <Text style={{ fontSize: 13, color: '#8B8A7E', marginTop: 4 }}>功能最全</Text>
+        </Box>
+        <Text style={{ fontSize: 17, color: '#55544A', width: 400, paddingRight: 24, lineHeight: 1.6 }}>
+          数据维度多，图表齐全，能长期打卡
+        </Text>
+        <Text style={{ fontSize: 17, color: '#33352E', flex: 1, lineHeight: 1.6 }}>
+          要填的太多，老人用不了；界面像体检报告，
+          <span style={{ fontWeight: 'bold', color: '#C0473C' }}>看不下去</span>
+        </Text>
+      </Box>
+
+      <Box style={{
+        marginTop: 16, background: '#2F4A2B', borderRadius: 4,
+        paddingTop: 14, paddingBottom: 14, paddingLeft: 24, paddingRight: 24,
+        flexDirection: 'row', alignItems: 'center',
+      }}>
+        <Text style={{ fontSize: 15, color: '#A8C09A', letterSpacing: 2, width: 100 }}>我们的判断</Text>
+        <Text style={{ fontSize: 19, color: '#FFFFFF', fontWeight: 'bold', flex: 1, lineHeight: 1.55 }}>
+          四类各解决一段。缺的是把它们串起来的那个容器 —— 而且这个容器必须先让人愿意打开。
+        </Text>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>03 / 14</Text>
+    </Box>
+  </Box>
+</Slide>

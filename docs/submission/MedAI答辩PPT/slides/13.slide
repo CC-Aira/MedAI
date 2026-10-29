@@ -1,0 +1,147 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#2F4A2B', letterSpacing: 2, fontWeight: 'bold' }}>07　创新点</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#2F4A2B' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 20, flexDirection: 'column' }}>
+      <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+        七条创新点，没有一条是"多加一个功能"
+      </Text>
+      <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6 }}>
+        技术创新点把"该确定的"从模型手里拿回来；应用创新点把一个动作的完成成本压到最低。
+      </Text>
+
+      <Box style={{ flexDirection: 'row', marginTop: 18, gap: 26 }}>
+        <Box style={{ flex: 1, flexDirection: 'column' }}>
+          <Box style={{
+            flexDirection: 'row', alignItems: 'center', background: '#2F4A2B', borderRadius: 4,
+            paddingTop: 10, paddingBottom: 10, paddingLeft: 14, paddingRight: 14,
+          }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#FFFFFF' }}>技术创新点</Text>
+            <Text style={{ fontSize: 13, color: '#A8C09A', flex: 1, textAlign: 'right' }}>4 条 · 让行为可预测</Text>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', marginTop: 12 }}>
+            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#C0473C', width: 30 }}>T1</Text>
+            <Box style={{ flexDirection: 'column', flex: 1 }}>
+              <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>红旗症状不走模型</Text>
+              <Text style={{ fontSize: 14, color: '#55544A', marginTop: 2, lineHeight: 1.5 }}>
+                别人让模型判断"算不算紧急"；我们用 11 条本地正则先拦，126ms 出结果，模型挂了照样生效
+              </Text>
+            </Box>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', marginTop: 17 }}>
+            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#C0473C', width: 30 }}>T2</Text>
+            <Box style={{ flexDirection: 'column', flex: 1 }}>
+              <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>冲突判定用代码</Text>
+              <Text style={{ fontSize: 14, color: '#55544A', marginTop: 2, lineHeight: 1.5 }}>
+                别人让模型判断"与档案是否矛盾"；我们用 diffFacts() 做字段级比对，模型只负责抽取
+              </Text>
+            </Box>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', marginTop: 17 }}>
+            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#C0473C', width: 30 }}>T3</Text>
+            <Box style={{ flexDirection: 'column', flex: 1 }}>
+              <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>3D 木牌贴真字体</Text>
+              <Text style={{ fontSize: 14, color: '#55544A', marginTop: 2, lineHeight: 1.5 }}>
+                别人把文字烘成贴图，缩放就糊；我们把 HTML 文字层用单应矩阵投影到板面四角
+              </Text>
+            </Box>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', marginTop: 17 }}>
+            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#C0473C', width: 30 }}>T4</Text>
+            <Box style={{ flexDirection: 'column', flex: 1 }}>
+              <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>提醒走两条通道</Text>
+              <Text style={{ fontSize: 14, color: '#55544A', marginTop: 2, lineHeight: 1.5 }}>
+                别人只依赖系统通知，拒一次权限功能就废；我们先让兔子说一句，有权限再补通知
+              </Text>
+            </Box>
+          </Box>
+        </Box>
+
+        <Box style={{ width: 1, background: '#E2DED0' }} />
+
+        <Box style={{ flex: 1, flexDirection: 'column' }}>
+          <Box style={{
+            flexDirection: 'row', alignItems: 'center', background: '#3A5A34', borderRadius: 4,
+            paddingTop: 10, paddingBottom: 10, paddingLeft: 14, paddingRight: 14,
+          }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#FFFFFF' }}>应用创新点</Text>
+            <Text style={{ fontSize: 13, color: '#A8C09A', flex: 1, textAlign: 'right' }}>3 条 · 压低完成成本</Text>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', marginTop: 12 }}>
+            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#2F4A2B', width: 30 }}>A1</Text>
+            <Box style={{ flexDirection: 'column', flex: 1 }}>
+              <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>打卡压到一行一次点击</Text>
+              <Text style={{ fontSize: 14, color: '#55544A', marginTop: 2, lineHeight: 1.5 }}>
+                别人的路径是四步（提醒→档案→找药→点已服），我们是两步，且厨房里一只手能完成
+              </Text>
+            </Box>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', marginTop: 17 }}>
+            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#2F4A2B', width: 30 }}>A2</Text>
+            <Box style={{ flexDirection: 'column', flex: 1 }}>
+              <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>把问诊变成一张能带走的纸</Text>
+              <Text style={{ fontSize: 14, color: '#55544A', marginTop: 2, lineHeight: 1.5 }}>
+                别人聊完就结束；我们按 A4 重排版式，可打印、可纯文本，还能把时间轴投影给医生看
+              </Text>
+            </Box>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', marginTop: 17 }}>
+            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#2F4A2B', width: 30 }}>A3</Text>
+            <Box style={{ flexDirection: 'column', flex: 1 }}>
+              <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>一个账号管全家且互不可见</Text>
+              <Text style={{ fontSize: 14, color: '#55544A', marginTop: 2, lineHeight: 1.5 }}>
+                别人要么一人一号（老人不会注册），要么全部可见；我们在 SQL 层挡越权
+              </Text>
+            </Box>
+          </Box>
+
+          <Box style={{
+            marginTop: 16, background: '#FAF7EF', borderLeft: '4px solid #2F4A2B',
+            paddingTop: 11, paddingBottom: 11, paddingLeft: 13, paddingRight: 13,
+          }}>
+            <Text style={{ fontSize: 15, color: '#33352E', lineHeight: 1.55 }}>
+              <span style={{ fontWeight: 'bold' }}>差异不在功能数量，而在"一个动作的完成度"：</span>
+              打卡是两个动作、问诊是一次点击、复诊材料是一张能打印的纸。
+            </Text>
+          </Box>
+        </Box>
+      </Box>
+
+      <Box style={{
+        marginTop: 18, background: '#2F4A2B', borderRadius: 4,
+        paddingTop: 13, paddingBottom: 13, paddingLeft: 20, paddingRight: 20,
+        flexDirection: 'row', alignItems: 'center',
+      }}>
+        <Text style={{ fontSize: 14, color: '#A8C09A', letterSpacing: 1, width: 130 }}>对应评分维度</Text>
+        <Text style={{ fontSize: 16, color: '#FFFFFF', flex: 1, lineHeight: 1.5 }}>
+          AI 技术深度（T1 / T2）· 创新性（T3 / T4 / A1 / A2 / A3）· 用户体验与交互（A1）·
+          实用性（A2 / A3）—— 七条创新点都能被当场演示或当场验证。
+        </Text>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>13 / 14</Text>
+    </Box>
+  </Box>
+</Slide>

@@ -1,0 +1,116 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#2F4A2B', letterSpacing: 2, fontWeight: 'bold' }}>01　问题</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#2F4A2B' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 24, flexDirection: 'column' }}>
+      <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+        家里的药，没有人真的在管
+      </Text>
+      <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6 }}>
+        中国有 3 亿慢性病患者，"一个家里谁在管药"这件事，通常落在那个二三十岁的子女身上。
+      </Text>
+
+      <Box style={{ flexDirection: 'row', marginTop: 18 }}>
+        <Box style={{ width: 690, flexDirection: 'column', paddingRight: 36 }}>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#2F4A2B', marginBottom: 8 }}>
+            一件真的发生过的事
+          </Text>
+          <Text style={{ fontSize: 18, color: '#33352E', lineHeight: 1.8 }}>
+            我奶奶有高血压和糖尿病，每天四次药。有一次我妈出差三天，回来发现她把两天的药
+            一次吃了。这件事之后我才意识到，家里的药其实没有人真的在管 ——
+            <span style={{ fontWeight: 'bold', color: '#C0473C' }}>老人记不清今天这顿吃没吃，子女问不出来，重复服药的风险就从这里长出来。</span>
+            <br /><br />
+            同样说不清的还有两件事：复诊只有三分钟，医生问"上次那个药还吃着吗"，患者答不上来；
+            医生说了一堆注意事项，一周后只剩一句"多喝水"。
+            <span style={{ fontWeight: 'bold' }}>共同点是信息散落在药盒、纸质病历、微信记录和老人的记忆里，
+            没有一个地方把它们收在一起。</span>
+          </Text>
+
+          <Box style={{
+            flexDirection: 'row', alignItems: 'center', marginTop: 14,
+            background: '#FAF7EF', borderLeft: '4px solid #2F4A2B', paddingTop: 10, paddingBottom: 10,
+            paddingLeft: 16, paddingRight: 16,
+          }}>
+            <Text style={{ fontSize: 17, color: '#2F4A2B', lineHeight: 1.65 }}>
+              问题定义：<span style={{ fontWeight: 'bold' }}>缺的不是功能，是一个全家共用、一个人维护、
+              老人也看得懂的容器。</span>
+            </Text>
+          </Box>
+        </Box>
+
+        <Box style={{ width: 470, flexDirection: 'column', gap: 10 }}>
+          <Box style={{
+            background: '#F3F1E7', borderRadius: 4, paddingTop: 13, paddingBottom: 13,
+            paddingLeft: 22, paddingRight: 22, flexDirection: 'row', alignItems: 'center',
+          }}>
+            <Text style={{ fontSize: 44, fontWeight: 'bold', color: '#2F4A2B', width: 118, fontFamily: 'Microsoft YaHei' }}>
+              3 亿
+            </Text>
+            <Box style={{ flexDirection: 'column', flex: 1 }}>
+              <Text style={{ fontSize: 17, color: '#1C1F1A', fontWeight: 'bold' }}>慢性病患者</Text>
+              <Text style={{ fontSize: 13, color: '#8B8A7E', marginTop: 3 }}>其中不少是需要长期服药的老人</Text>
+            </Box>
+          </Box>
+
+          <Box style={{
+            background: '#F3F1E7', borderRadius: 4, paddingTop: 13, paddingBottom: 13,
+            paddingLeft: 22, paddingRight: 22, flexDirection: 'row', alignItems: 'center',
+          }}>
+            <Text style={{ fontSize: 44, fontWeight: 'bold', color: '#C0473C', width: 118, fontFamily: 'Microsoft YaHei' }}>
+              50%
+            </Text>
+            <Box style={{ flexDirection: 'column', flex: 1 }}>
+              <Text style={{ fontSize: 17, color: '#1C1F1A', fontWeight: 'bold' }}>长期用药依从率</Text>
+              <Text style={{ fontSize: 13, color: '#8B8A7E', marginTop: 3 }}>慢病患者长期治疗依从率约五成</Text>
+            </Box>
+          </Box>
+
+          <Box style={{
+            background: '#F3F1E7', borderRadius: 4, paddingTop: 13, paddingBottom: 13,
+            paddingLeft: 22, paddingRight: 22, flexDirection: 'row', alignItems: 'center',
+          }}>
+            <Text style={{ fontSize: 44, fontWeight: 'bold', color: '#2F4A2B', width: 118, fontFamily: 'Microsoft YaHei' }}>
+              3 分钟
+            </Text>
+            <Box style={{ flexDirection: 'column', flex: 1 }}>
+              <Text style={{ fontSize: 17, color: '#1C1F1A', fontWeight: 'bold' }}>一次门诊沟通</Text>
+              <Text style={{ fontSize: 13, color: '#8B8A7E', marginTop: 3 }}>医生没时间听完三个月的病程</Text>
+            </Box>
+          </Box>
+
+          <Box style={{
+            background: '#2F4A2B', borderRadius: 4, paddingTop: 14, paddingBottom: 14,
+            paddingLeft: 22, paddingRight: 22, flexDirection: 'column',
+          }}>
+            <Text style={{ fontSize: 17, color: '#FFFFFF', fontWeight: 'bold', lineHeight: 1.55 }}>
+              这三件事，构成一个家庭每天都在面对、
+              但没有任何工具完整接住的场景。
+            </Text>
+          </Box>
+
+          <Text style={{ fontSize: 11, color: '#A8A695', lineHeight: 1.5 }}>
+            数据来源：《中国居民营养与慢性病状况报告（2020 年）》；
+            WHO《Adherence to Long-term Therapies》
+          </Text>
+        </Box>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>02 / 14</Text>
+    </Box>
+  </Box>
+</Slide>

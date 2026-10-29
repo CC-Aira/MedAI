@@ -1,0 +1,127 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#2F4A2B', letterSpacing: 2, fontWeight: 'bold' }}>03　架构</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#2F4A2B' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 22, flexDirection: 'column' }}>
+      <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+        五层分离：模型只有一条出口，安全判断不在这条路上
+      </Text>
+      <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6 }}>
+        23 个接口统一走"校验输入 → 认门 → 查配置 → 干活"四步；业务代码不直接调用模型。
+      </Text>
+
+      <Box style={{ flexDirection: 'column', marginTop: 22, gap: 8 }}>
+        <Box style={{
+          flexDirection: 'row', background: '#FAF7EF', borderLeft: '5px solid #8ABFEB', borderRadius: 3,
+          paddingTop: 14, paddingBottom: 14, paddingLeft: 20, paddingRight: 20, alignItems: 'center',
+        }}>
+          <Box style={{ width: 130, flexDirection: 'column' }}>
+            <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#1C1F1A' }}>表现层</Text>
+            <Text style={{ fontSize: 12, color: '#8B8A7E', marginTop: 2 }}>浏览器</Text>
+          </Box>
+          <Text style={{ fontSize: 17, color: '#33352E', flex: 1, lineHeight: 1.55 }}>
+            3D 草地（Three.js 实例化渲染）· 档案栏 · 问诊面板 · 科普库
+          </Text>
+          <Text style={{ fontSize: 13, color: '#5A7A9B', width: 150, lineHeight: 1.5 }}>
+            同源 fetch<br />SSE 流式接收
+          </Text>
+        </Box>
+
+        <Box style={{
+          flexDirection: 'row', background: '#FAF7EF', borderLeft: '5px solid #8ABFEB', borderRadius: 3,
+          paddingTop: 14, paddingBottom: 14, paddingLeft: 20, paddingRight: 20, alignItems: 'center',
+        }}>
+          <Box style={{ width: 130, flexDirection: 'column' }}>
+            <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#1C1F1A' }}>接口层</Text>
+            <Text style={{ fontSize: 12, color: '#8B8A7E', marginTop: 2 }}>23 个路由</Text>
+          </Box>
+          <Text style={{ fontSize: 17, color: '#33352E', flex: 1, lineHeight: 1.55 }}>
+            Route Handler：统一入口守卫 <span style={{ fontWeight: 'bold' }}>requireUser()</span>，
+            所有查询强制带 <span style={{ fontWeight: 'bold' }}>ownerId</span>
+          </Text>
+          <Text style={{ fontSize: 13, color: '#5A7A9B', width: 150, lineHeight: 1.5 }}>
+            400 / 404 / 429 / 503<br />四类错误分开返回
+          </Text>
+        </Box>
+
+        <Box style={{
+          flexDirection: 'row', background: '#FAF7EF', borderLeft: '5px solid #6E8F5E', borderRadius: 3,
+          paddingTop: 14, paddingBottom: 14, paddingLeft: 20, paddingRight: 20, alignItems: 'center',
+        }}>
+          <Box style={{ width: 130, flexDirection: 'column' }}>
+            <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#1C1F1A' }}>领域层</Text>
+            <Text style={{ fontSize: 12, color: '#8B8A7E', marginTop: 2 }}>纯函数 / 纯本地</Text>
+          </Box>
+          <Text style={{ fontSize: 17, color: '#33352E', flex: 1, lineHeight: 1.55 }}>
+            红旗规则（11 条）· 提示词装配 · 事实核对（diffFacts）· 排程与依从性 · 就诊摘要
+          </Text>
+          <Text style={{ fontSize: 13, color: '#4F6B42', width: 150, lineHeight: 1.5 }}>
+            不依赖模型<br />可单测、可解释
+          </Text>
+        </Box>
+
+        <Box style={{
+          flexDirection: 'row', background: '#2F4A2B', borderRadius: 3,
+          paddingTop: 15, paddingBottom: 15, paddingLeft: 20, paddingRight: 20, alignItems: 'center',
+        }}>
+          <Box style={{ width: 130, flexDirection: 'column' }}>
+            <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#FFFFFF' }}>AI 适配层</Text>
+            <Text style={{ fontSize: 12, color: '#A8C09A', marginTop: 2 }}>唯一出口</Text>
+          </Box>
+          <Text style={{ fontSize: 17, color: '#FFFFFF', flex: 1, lineHeight: 1.55 }}>
+            lib/ai.ts：OpenAI 兼容协议 · 流式与非流式共用一条通路 · 90 秒首包超时 ·
+            换厂商只改环境变量
+          </Text>
+          <Text style={{ fontSize: 13, color: '#C6D8B8', width: 150, lineHeight: 1.5 }}>
+            业务代码不出现<br />裸 fetch 模型
+          </Text>
+        </Box>
+
+        <Box style={{
+          flexDirection: 'row', background: '#FAF7EF', borderLeft: '5px solid #9AA5B5', borderRadius: 3,
+          paddingTop: 14, paddingBottom: 14, paddingLeft: 20, paddingRight: 20, alignItems: 'center',
+        }}>
+          <Box style={{ width: 130, flexDirection: 'column' }}>
+            <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#1C1F1A' }}>数据层</Text>
+            <Text style={{ fontSize: 12, color: '#8B8A7E', marginTop: 2 }}>SQLite / 可切库</Text>
+          </Box>
+          <Text style={{ fontSize: 17, color: '#33352E', flex: 1, lineHeight: 1.55 }}>
+            Prisma 6 + SQLite：WAL · busy_timeout 5s · 连接池压到 1；附件落本地磁盘
+          </Text>
+          <Text style={{ fontSize: 13, color: '#5A6B7D', width: 150, lineHeight: 1.5 }}>
+            schema.postgres 已备<br />改连接串即可切
+          </Text>
+        </Box>
+      </Box>
+
+      <Box style={{
+        marginTop: 18, flexDirection: 'row', alignItems: 'center',
+        background: '#FAF7EF', borderLeft: '4px solid #C0473C', paddingTop: 12, paddingBottom: 12,
+        paddingLeft: 18, paddingRight: 18,
+      }}>
+        <Text style={{ fontSize: 17, color: '#33352E', lineHeight: 1.6 }}>
+          <span style={{ fontWeight: 'bold', color: '#C0473C' }}>注意第 3 层和第 4 层是分开的：</span>
+          红旗判断、冲突判定、排程计算都在领域层完成，不经过 AI 适配层 ——
+          模型挂了、Key 过期了、断网了，这些能力照样在。
+        </Text>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>06 / 14</Text>
+    </Box>
+  </Box>
+</Slide>

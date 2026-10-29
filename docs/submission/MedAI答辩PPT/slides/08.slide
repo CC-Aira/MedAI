@@ -1,0 +1,107 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#C0473C', letterSpacing: 2, fontWeight: 'bold' }}>04　AI 判断二</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#C0473C' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 20, flexDirection: 'column' }}>
+      <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+        红旗症状：这条线不交给模型
+      </Text>
+      <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6 }}>
+        胸痛、呼吸困难、意识不清这类话一出现，不去问模型"这算不算紧急"——本地规则先拦一遍。
+      </Text>
+
+      <Box style={{ flexDirection: 'row', marginTop: 14 }}>
+        <Box style={{ width: 570, flexDirection: 'column' }}>
+          <Image src="assets/redflag.png" style={{ width: 570, height: 386, objectFit: 'cover', borderRadius: 6, border: '1px solid #E5CFCA' }} />
+          <Text style={{ fontSize: 12, color: '#8B8A7E', marginTop: 8, lineHeight: 1.5 }}>
+            图 3　命中后不再走常规问诊：红卡片中断对话，给出即时行动清单
+          </Text>
+        </Box>
+
+        <Box style={{ flex: 1, flexDirection: 'column', paddingLeft: 28 }}>
+          <Box style={{ flexDirection: 'row', gap: 12 }}>
+            <Box style={{
+              flex: 1, background: '#C0473C', borderRadius: 4, paddingTop: 14, paddingBottom: 14,
+              paddingLeft: 16, paddingRight: 16, flexDirection: 'column',
+            }}>
+              <Text style={{ fontSize: 46, fontWeight: 'bold', color: '#FFFFFF', lineHeight: 1, fontFamily: 'Microsoft YaHei' }}>
+                126<span style={{ fontSize: 24 }}>ms</span>
+              </Text>
+              <Text style={{ fontSize: 14, color: '#F5DAD6', marginTop: 6 }}>本地规则拦截</Text>
+            </Box>
+            <Box style={{
+              flex: 1, background: '#F3F1E7', borderRadius: 4, paddingTop: 14, paddingBottom: 14,
+              paddingLeft: 16, paddingRight: 16, flexDirection: 'column',
+            }}>
+              <Text style={{ fontSize: 46, fontWeight: 'bold', color: '#8B8A7E', lineHeight: 1, fontFamily: 'Microsoft YaHei' }}>
+                1646<span style={{ fontSize: 24 }}>ms</span>
+              </Text>
+              <Text style={{ fontSize: 14, color: '#8B8A7E', marginTop: 6 }}>走模型判定</Text>
+            </Box>
+          </Box>
+          <Text style={{ fontSize: 13, color: '#8B8A7E', marginTop: 7 }}>
+            13 倍差距。但真正重要的不是快，而是断网、Key 过期、上游 500 时它照样生效。
+          </Text>
+
+          <Box style={{ flexDirection: 'column', marginTop: 10, gap: 7 }}>
+            <Box style={{ flexDirection: 'row' }}>
+              <Box style={{ width: 4, background: '#C0473C', marginRight: 12 }} />
+              <Box style={{ flexDirection: 'column', flex: 1 }}>
+                <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>11 条规则，纯正则，零依赖</Text>
+                <Text style={{ fontSize: 15, color: '#55544A', marginTop: 3, lineHeight: 1.55 }}>
+                  覆盖胸痛、言语不清、抽搐、意识改变、大出血、呼吸困难等急症表述
+                </Text>
+              </Box>
+            </Box>
+
+            <Box style={{ flexDirection: 'row' }}>
+              <Box style={{ width: 4, background: '#C0473C', marginRight: 12 }} />
+              <Box style={{ flexDirection: 'column', flex: 1 }}>
+                <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>命中即落库，刷新之后还是红的</Text>
+                <Text style={{ fontSize: 15, color: '#55544A', marginTop: 3, lineHeight: 1.55 }}>
+                  标记写进消息 flag 字段，安全提示不会被一次刷新冲掉
+                </Text>
+              </Box>
+            </Box>
+
+            <Box style={{ flexDirection: 'row' }}>
+              <Box style={{ width: 4, background: '#C0473C', marginRight: 12 }} />
+              <Box style={{ flexDirection: 'column', flex: 1 }}>
+                <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>冲突判定同样不交给模型</Text>
+                <Text style={{ fontSize: 15, color: '#55544A', marginTop: 3, lineHeight: 1.55 }}>
+                  模型只说"可能不一致"，是否真不一致由 diffFacts() 比对字段
+                </Text>
+              </Box>
+            </Box>
+          </Box>
+
+          <Box style={{
+            marginTop: 10, background: '#1F3320', borderRadius: 4, paddingTop: 12, paddingBottom: 12,
+            paddingLeft: 16, paddingRight: 16,
+          }}>
+            <Text style={{ fontSize: 17, color: '#FFFFFF', fontWeight: 'bold', lineHeight: 1.5 }}>
+              它不是一项功能，是一条底线。
+            </Text>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>08 / 14</Text>
+    </Box>
+  </Box>
+</Slide>

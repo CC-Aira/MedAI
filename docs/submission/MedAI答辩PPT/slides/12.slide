@@ -1,0 +1,145 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#2F4A2B', letterSpacing: 2, fontWeight: 'bold' }}>06　工程质量</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#2F4A2B' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 20, flexDirection: 'column' }}>
+      <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+        不看清单看行为：解压跑通才算能交付
+      </Text>
+      <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6 }}>
+        没有引入测试框架，但有 5 套可重复执行的自检脚本；每次改动后跑一遍，输出通过 / 失败计数。
+      </Text>
+
+      <Box style={{ flexDirection: 'row', marginTop: 18 }}>
+        <Box style={{ width: 620, flexDirection: 'column' }}>
+          <Box style={{ flexDirection: 'row', paddingBottom: 11, borderBottom: '2px solid #2F4A2B' }}>
+            <Text style={{ fontSize: 14, color: '#2F4A2B', fontWeight: 'bold', width: 300 }}>自检脚本</Text>
+            <Text style={{ fontSize: 14, color: '#2F4A2B', fontWeight: 'bold', width: 80, textAlign: 'right' }}>项数</Text>
+            <Text style={{ fontSize: 14, color: '#2F4A2B', fontWeight: 'bold', flex: 1, textAlign: 'right' }}>覆盖</Text>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 16, paddingBottom: 16, borderBottom: '1px solid #E2DED0' }}>
+            <Text style={{ fontSize: 16, color: '#1C1F1A', width: 300 }}>接口测试 api-test</Text>
+            <Text style={{ fontSize: 26, color: '#2F4A2B', fontWeight: 'bold', width: 80, textAlign: 'right' }}>68</Text>
+            <Text style={{ fontSize: 14, color: '#8B8A7E', flex: 1, textAlign: 'right' }}>鉴权 / 越权 / 档案 / 用药</Text>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 16, paddingBottom: 16, borderBottom: '1px solid #E2DED0' }}>
+            <Text style={{ fontSize: 16, color: '#1C1F1A', width: 300 }}>木牌回归 check-board</Text>
+            <Text style={{ fontSize: 26, color: '#2F4A2B', fontWeight: 'bold', width: 80, textAlign: 'right' }}>33</Text>
+            <Text style={{ fontSize: 14, color: '#8B8A7E', flex: 1, textAlign: 'right' }}>打卡 / 三处同步 / resize</Text>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 16, paddingBottom: 16, borderBottom: '1px solid #E2DED0' }}>
+            <Text style={{ fontSize: 16, color: '#1C1F1A', width: 300 }}>提醒逻辑 check-reminder</Text>
+            <Text style={{ fontSize: 26, color: '#2F4A2B', fontWeight: 'bold', width: 80, textAlign: 'right' }}>20</Text>
+            <Text style={{ fontSize: 14, color: '#8B8A7E', flex: 1, textAlign: 'right' }}>时间计算 / 免打扰 / 漏服封顶</Text>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 16, paddingBottom: 16, borderBottom: '1px solid #E2DED0' }}>
+            <Text style={{ fontSize: 16, color: '#1C1F1A', width: 300 }}>登录与入口 check-login / entry</Text>
+            <Text style={{ fontSize: 26, color: '#2F4A2B', fontWeight: 'bold', width: 80, textAlign: 'right' }}>26</Text>
+            <Text style={{ fontSize: 14, color: '#8B8A7E', flex: 1, textAlign: 'right' }}>Cookie / 越权 / 404 出口</Text>
+          </Box>
+
+          <Box style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 16, paddingBottom: 16 }}>
+            <Text style={{ fontSize: 16, color: '#1C1F1A', width: 300 }}>类型与规范 tsc / eslint</Text>
+            <Text style={{ fontSize: 26, color: '#2F4A2B', fontWeight: 'bold', width: 80, textAlign: 'right' }}>0</Text>
+            <Text style={{ fontSize: 14, color: '#8B8A7E', flex: 1, textAlign: 'right' }}>错误数</Text>
+          </Box>
+
+          <Box style={{
+            marginTop: 8, background: '#2F4A2B', borderRadius: 4, paddingTop: 13, paddingBottom: 13,
+            paddingLeft: 18, paddingRight: 18, flexDirection: 'row', alignItems: 'center',
+          }}>
+            <Text style={{ fontSize: 17, color: '#FFFFFF', fontWeight: 'bold', flex: 1 }}>
+              合计 147 项断言，全部通过
+            </Text>
+            <Text style={{ fontSize: 13, color: '#A8C09A' }}>可重复执行，不靠肉眼</Text>
+          </Box>
+
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#2F4A2B', marginTop: 15, marginBottom: 8 }}>
+            三条工程习惯
+          </Text>
+          <Box style={{ flexDirection: 'column', gap: 6 }}>
+            <Text style={{ fontSize: 15, color: '#33352E', lineHeight: 1.55 }}>
+              · 校验脚本都写成可重复执行的 .mjs / .ts，跑完输出计数，不靠肉眼比对
+            </Text>
+            <Text style={{ fontSize: 15, color: '#33352E', lineHeight: 1.55 }}>
+              · 打包红线用代码表达（排除密钥、数据库、上传件），并在打包后独立复查一遍
+            </Text>
+            <Text style={{ fontSize: 15, color: '#33352E', lineHeight: 1.55 }}>
+              · 排除规则与复查规则不共用同一套窄逻辑，否则两边一起漏
+            </Text>
+          </Box>
+        </Box>
+
+        <Box style={{ flex: 1, flexDirection: 'column', paddingLeft: 32 }}>
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#2F4A2B', marginBottom: 10 }}>四条部署路线</Text>
+
+          <Box style={{ flexDirection: 'column', gap: 8 }}>
+            <Box style={{ flexDirection: 'row', background: '#FAF7EF', borderRadius: 4, paddingTop: 10, paddingBottom: 10, paddingLeft: 12, paddingRight: 12 }}>
+              <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#1C1F1A', width: 88 }}>本机直跑</Text>
+              <Text style={{ fontSize: 14, color: '#55544A', flex: 1 }}>双击 Start MedAI.bat，首次自动补齐四步</Text>
+            </Box>
+            <Box style={{ flexDirection: 'row', background: '#FAF7EF', borderRadius: 4, paddingTop: 10, paddingBottom: 10, paddingLeft: 12, paddingRight: 12 }}>
+              <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#1C1F1A', width: 88 }}>Docker</Text>
+              <Text style={{ fontSize: 14, color: '#55544A', flex: 1 }}>多阶段构建，只留 standalone 产物</Text>
+            </Box>
+            <Box style={{ flexDirection: 'row', background: '#FAF7EF', borderRadius: 4, paddingTop: 10, paddingBottom: 10, paddingLeft: 12, paddingRight: 12 }}>
+              <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#1C1F1A', width: 88 }}>Caddy 反代</Text>
+              <Text style={{ fontSize: 14, color: '#55544A', flex: 1 }}>自动 HTTPS，容器只监听内网端口</Text>
+            </Box>
+            <Box style={{ flexDirection: 'row', background: '#FAF7EF', borderRadius: 4, paddingTop: 10, paddingBottom: 10, paddingLeft: 12, paddingRight: 12 }}>
+              <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#1C1F1A', width: 88 }}>离线包</Text>
+              <Text style={{ fontSize: 14, color: '#55544A', flex: 1 }}>47MB，解压即跑，无 CDN 依赖</Text>
+            </Box>
+          </Box>
+
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#2F4A2B', marginTop: 15, marginBottom: 8 }}>交付前的真实验收</Text>
+          <Box style={{ flexDirection: 'column', gap: 6 }}>
+            <Text style={{ fontSize: 15, color: '#33352E', lineHeight: 1.5 }}>
+              解压到独立目录 → npm ci → prisma generate → db push → 起服务 →
+              跑一遍登录、建档、加药、打卡、科普库
+            </Text>
+          </Box>
+          <Box style={{
+            marginTop: 10, background: '#FAF7EF', borderLeft: '4px solid #C0473C', paddingTop: 10, paddingBottom: 10,
+            paddingLeft: 12, paddingRight: 12,
+          }}>
+            <Text style={{ fontSize: 14, color: '#33352E', lineHeight: 1.55 }}>
+              <span style={{ fontWeight: 'bold', color: '#C0473C' }}>这一步抓到过一个真 bug：</span>
+              排除规则把 .next/node_modules 整棵剪掉，解压后 next start 直接报错 —— 只有真解压才会暴露。
+            </Text>
+          </Box>
+
+          <Box style={{
+            marginTop: 10, background: '#1F3320', borderRadius: 4, paddingTop: 11, paddingBottom: 11,
+            paddingLeft: 14, paddingRight: 14,
+          }}>
+            <Text style={{ fontSize: 14, color: '#D8E4CC', lineHeight: 1.5 }}>
+              Next.js 16 · React 19 · TS 5.9 · Three.js 0.170 · Prisma 6 · SQLite · DeepSeek
+            </Text>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>12 / 14</Text>
+    </Box>
+  </Box>
+</Slide>

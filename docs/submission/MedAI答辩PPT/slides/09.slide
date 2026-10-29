@@ -1,0 +1,125 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#2F4A2B', letterSpacing: 2, fontWeight: 'bold' }}>04　AI 判断三</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#2F4A2B' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 24, flexDirection: 'column' }}>
+      <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <Box style={{ flexDirection: 'column' }}>
+          <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+            AI 提建议，患者点头
+          </Text>
+          <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6 }}>
+            模型可以从对话里抽取事实，但它一个字都写不进档案 —— 落库这一步必须由人按下。
+          </Text>
+        </Box>
+        <Box style={{
+          flexDirection: 'column', alignItems: 'flex-end', borderRight: '3px solid #2F4A2B',
+          paddingRight: 14, paddingTop: 2, paddingBottom: 2,
+        }}>
+          <Text style={{ fontSize: 15, color: '#2F4A2B', fontWeight: 'bold', letterSpacing: 1 }}>核心原则</Text>
+          <Text style={{ fontSize: 15, color: '#8B8A7E', marginTop: 4 }}>AI 只负责抽取，不负责决定</Text>
+        </Box>
+      </Box>
+
+      <Box style={{ flexDirection: 'row', marginTop: 20, gap: 12, height: 206 }}>
+        <Box style={{
+          flex: 1, background: '#FAF7EF', border: '1px solid #E2DED0', borderRadius: 6,
+          paddingTop: 22, paddingBottom: 22, paddingLeft: 18, paddingRight: 18, flexDirection: 'column', justifyContent: 'space-between',
+        }}>
+          <Text style={{ fontSize: 13, color: '#8ABFEB', fontWeight: 'bold', letterSpacing: 2 }}>STEP 01</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1C1F1A', marginTop: 6 }}>模型只返回候选</Text>
+          <Text style={{ fontSize: 16, color: '#55544A', marginTop: 8, lineHeight: 1.65 }}>
+            三类：fill（档案里空着的字段）、add（对话里新提到的药）、
+            conflict（与现有档案矛盾的信息）
+          </Text>
+        </Box>
+
+        <Box style={{ width: 40, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 26, color: '#B5B2A0' }}>→</Text>
+        </Box>
+
+        <Box style={{
+          flex: 1, background: '#FAF7EF', border: '1px solid #E2DED0', borderRadius: 6,
+          paddingTop: 22, paddingBottom: 22, paddingLeft: 18, paddingRight: 18, flexDirection: 'column', justifyContent: 'space-between',
+        }}>
+          <Text style={{ fontSize: 13, color: '#8ABFEB', fontWeight: 'bold', letterSpacing: 2 }}>STEP 02</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1C1F1A', marginTop: 6 }}>由代码判定冲突</Text>
+          <Text style={{ fontSize: 16, color: '#55544A', marginTop: 8, lineHeight: 1.65 }}>
+            diffFacts() 做字段级比对。fill 与 add 默认勾选；
+            <span style={{ fontWeight: 'bold', color: '#C0473C' }}>conflict 默认不勾选并红色高亮</span>
+          </Text>
+        </Box>
+
+        <Box style={{ width: 40, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 26, color: '#B5B2A0' }}>→</Text>
+        </Box>
+
+        <Box style={{
+          flex: 1, background: '#2F4A2B', borderRadius: 6,
+          paddingTop: 22, paddingBottom: 22, paddingLeft: 18, paddingRight: 18, flexDirection: 'column', justifyContent: 'space-between',
+        }}>
+          <Text style={{ fontSize: 13, color: '#A8C09A', fontWeight: 'bold', letterSpacing: 2 }}>STEP 03</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#FFFFFF', marginTop: 6 }}>患者确认才落库</Text>
+          <Text style={{ fontSize: 16, color: '#D8E4CC', marginTop: 8, lineHeight: 1.65 }}>
+            落库前每条都当不可信输入重新校验：字段白名单、长度上限、
+            单次 ≤ 20 条、medicationId 按 ownerId 重查
+          </Text>
+        </Box>
+      </Box>
+
+      <Box style={{ flexDirection: 'row', marginTop: 18, gap: 16 }}>
+        <Box style={{ flex: 1, flexDirection: 'column', borderTop: '3px solid #2F4A2B', paddingTop: 12 }}>
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#1C1F1A' }}>结论卡片不许自动生成</Text>
+          <Text style={{ fontSize: 16, color: '#55544A', marginTop: 7, lineHeight: 1.65 }}>
+            客观事实可以让 AI 整理，但"哪句重要"是价值判断 —— 只有患者自己知道。
+            这个取舍让产品少了一个看起来很酷的功能，但保住了判断权在人手里这条线。
+          </Text>
+        </Box>
+
+        <Box style={{ flex: 1, flexDirection: 'column', borderTop: '3px solid #6E8F5E', paddingTop: 12 }}>
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#1C1F1A' }}>医疗合规三件套常驻</Text>
+          <Text style={{ fontSize: 16, color: '#55544A', marginTop: 7, lineHeight: 1.65 }}>
+            不下诊断、不开处方；过敏史优先考虑并主动提醒；涉及处方药必须提示遵医嘱。
+            这三条写在系统提示词最前面，即使后面 token 超限需要裁剪，它们也不会被删掉。
+          </Text>
+        </Box>
+
+        <Box style={{ flex: 1, flexDirection: 'column', borderTop: '3px solid #9AA5B5', paddingTop: 12 }}>
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#1C1F1A' }}>失败不留孤儿数据</Text>
+          <Text style={{ fontSize: 16, color: '#55544A', marginTop: 7, lineHeight: 1.65 }}>
+            先调模型，流读完且内容非空，才把提问与回答一起写库。Key 配错、上游 500、
+            网络中断，都不会攒出一条"只有提问、没有回答"的孤儿记录。
+          </Text>
+        </Box>
+      </Box>
+
+      <Box style={{
+        marginTop: 16, background: '#1F3320', borderRadius: 4,
+        paddingTop: 13, paddingBottom: 13, paddingLeft: 22, paddingRight: 22,
+        flexDirection: 'row', alignItems: 'center',
+      }}>
+        <Text style={{ fontSize: 14, color: '#A8C09A', letterSpacing: 2, width: 110 }}>一句话</Text>
+        <Text style={{ fontSize: 18, color: '#FFFFFF', fontWeight: 'bold', flex: 1 }}>
+          判断权留在人手里 —— 这是这类产品能长期被信任的前提，也是它和"又一个 AI 聊天框"的区别。
+        </Text>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>09 / 14</Text>
+    </Box>
+  </Box>
+</Slide>

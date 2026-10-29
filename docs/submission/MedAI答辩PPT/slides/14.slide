@@ -1,0 +1,78 @@
+<Slide style={{ width: 1280, height: 720, background: '#1F3320', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{ flexDirection: 'row', width: 1280, height: 720 }}>
+      <Box style={{
+        width: 700, height: 720, paddingTop: 70, paddingLeft: 72, paddingRight: 40,
+        flexDirection: 'column', justifyContent: 'space-between', paddingBottom: 56,
+      }}>
+        <Box style={{ flexDirection: 'column' }}>
+          <Box style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Box style={{ width: 4, height: 26, background: '#8ABFEB', marginRight: 14 }} />
+              <Text style={{ fontSize: 14, color: '#8FA680', letterSpacing: 3 }}>结语</Text>
+            </Box>
+            <Text style={{ fontSize: 13, color: '#7E9470', letterSpacing: 1 }}>广东医科大学 · B 组 · 2026.10</Text>
+          </Box>
+          <Text style={{ fontSize: 15, color: '#7E9470', marginTop: 16, lineHeight: 1.6 }}>
+            MedAI 是一个面向普通家庭的健康档案与 AI 问诊工具：<br />
+            不替代医生，只做记录、提醒、翻译和整理。
+          </Text>
+        </Box>
+
+        <Box style={{ flexDirection: 'column', marginTop: 40 }}>
+          <Text style={{ fontSize: 40, fontWeight: 'bold', color: '#FFFFFF', lineHeight: 1.45, fontFamily: 'Microsoft YaHei' }}>
+            我们想做的不是<br />
+            又一个 AI 聊天框，<br />
+            而是<span style={{ color: '#8ABFEB' }}>一个家里真的会打开</span>的东西。
+          </Text>
+
+          <Box style={{ flexDirection: 'column', marginTop: 30, gap: 9 }}>
+            <Text style={{ fontSize: 17, color: '#C6D8B8', lineHeight: 1.6 }}>
+              · 不诊断、不开处方，也不替你决定哪条信息重要
+            </Text>
+            <Text style={{ fontSize: 17, color: '#C6D8B8', lineHeight: 1.6 }}>
+              · 安全判断不交给模型，判断权留在患者手里
+            </Text>
+            <Text style={{ fontSize: 17, color: '#C6D8B8', lineHeight: 1.6 }}>
+              · 一个 47MB 的离线包解开就能跑，断网也能用
+            </Text>
+          </Box>
+        </Box>
+
+        <Box style={{
+          position: 'absolute', bottom: 56, left: 72, width: 588,
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+          borderTop: '1px solid #3C5138', paddingTop: 16,
+        }}>
+          <Text style={{ fontSize: 13, color: '#7E9470' }}>
+            Next.js 16 · React 19 · Three.js · Prisma · SQLite · DeepSeek
+          </Text>
+          <Text style={{ fontSize: 13, color: '#7E9470' }}>广东医科大学 · 陈妍萱</Text>
+        </Box>
+      </Box>
+
+      <Box style={{ width: 580, height: 720, position: 'relative' }}>
+        <Image src="assets/mobile.png" style={{ width: 580, height: 720, objectFit: 'cover', opacity: 0.9 }} />
+        <Box style={{
+          position: 'absolute', top: 0, left: 0, width: 240, height: 720,
+          backgroundImage: 'linear-gradient(90deg, #1F3320 0%, rgba(31,51,32,0) 100%)',
+        }} />
+        <Box style={{
+          position: 'absolute', top: 44, right: 34, flexDirection: 'column', alignItems: 'flex-end',
+        }}>
+          <Text style={{ fontSize: 13, color: '#5F7350', letterSpacing: 2 }}>移动端实机界面</Text>
+          <Text style={{ fontSize: 13, color: '#5F7350', marginTop: 4 }}>主操作在首屏一次点击内完成</Text>
+        </Box>
+        <Box style={{
+          position: 'absolute', bottom: 46, left: 34, right: 34, background: 'rgba(31,51,32,0.86)',
+          borderRadius: 4, paddingTop: 13, paddingBottom: 13, paddingLeft: 16, paddingRight: 16,
+          flexDirection: 'column',
+        }}>
+          <Text style={{ fontSize: 15, color: '#D8E4CC', fontWeight: 'bold', lineHeight: 1.45 }}>
+            窄屏时左栏变底部抽屉，木牌变顶上一条 —— 提醒走两条通道，权限被拒功能也不废。
+          </Text>
+        </Box>
+      </Box>
+    </Box>
+  </Box>
+</Slide>

@@ -1,0 +1,81 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#2F4A2B', letterSpacing: 2, fontWeight: 'bold' }}>02　方案</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#2F4A2B' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 24, flexDirection: 'column' }}>
+      <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+        一个账号，管全家人的健康档案
+      </Text>
+      <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6 }}>
+        家里每个人是一块小牌子，点开就能对话；天上吊着一块木板，写着全家今天吃了几次药。
+      </Text>
+
+      <Box style={{ flexDirection: 'row', marginTop: 16 }}>
+        <Box style={{ width: 636, flexDirection: 'column' }}>
+          <Image src="assets/home.png" style={{ width: 636, height: 462, objectFit: 'cover', borderRadius: 6, border: '1px solid #D8D4C4' }} />
+          <Text style={{ fontSize: 12, color: '#8B8A7E', marginTop: 8 }}>
+            图 1　草地首页：左栏六份家庭档案，中间绒球医生，天上吊着用药木牌
+          </Text>
+        </Box>
+
+        <Box style={{ flex: 1, flexDirection: 'column', paddingLeft: 30, height: 490, justifyContent: 'space-between' }}>
+          <Box style={{ flexDirection: 'column', paddingBottom: 18, borderBottom: '1px solid #E2DED0' }}>
+            <Box style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+              <Text style={{ fontSize: 15, color: '#8ABFEB', fontWeight: 'bold', width: 34 }}>01</Text>
+              <Text style={{ fontSize: 21, fontWeight: 'bold', color: '#1C1F1A' }}>一个账号，多份档案</Text>
+            </Box>
+            <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6, lineHeight: 1.7, paddingLeft: 34 }}>
+              老人不用自己注册。越权在一条 SQL 里挡掉 —— 别人的档案和不存在返回同一个 404。
+            </Text>
+          </Box>
+
+          <Box style={{ flexDirection: 'column', paddingTop: 16, paddingBottom: 18, borderBottom: '1px solid #E2DED0' }}>
+            <Box style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+              <Text style={{ fontSize: 15, color: '#8ABFEB', fontWeight: 'bold', width: 34 }}>02</Text>
+              <Text style={{ fontSize: 21, fontWeight: 'bold', color: '#1C1F1A' }}>三个动作各有入口</Text>
+            </Box>
+            <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6, lineHeight: 1.7, paddingLeft: 34 }}>
+              吃药有木牌、看病有问诊、复诊有摘要与时间轴 —— 覆盖"吃、看、说"三件事。
+            </Text>
+          </Box>
+
+          <Box style={{ flexDirection: 'column', paddingTop: 18, paddingBottom: 18 }}>
+            <Box style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+              <Text style={{ fontSize: 15, color: '#8ABFEB', fontWeight: 'bold', width: 34 }}>03</Text>
+              <Text style={{ fontSize: 21, fontWeight: 'bold', color: '#1C1F1A' }}>AI 有明确边界</Text>
+            </Box>
+            <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6, lineHeight: 1.7, paddingLeft: 34 }}>
+              不诊断、不开处方、不替用户判断"哪句重要"。判断权留在患者手里。
+            </Text>
+          </Box>
+
+          <Box style={{
+            background: '#2F4A2B', borderRadius: 4, paddingTop: 14, paddingBottom: 14,
+            paddingLeft: 18, paddingRight: 18, marginTop: 4,
+          }}>
+            <Text style={{ fontSize: 17, color: '#FFFFFF', lineHeight: 1.6, fontWeight: 'bold' }}>
+              它首先得是个让人愿意在深夜打开的东西，其次才是工具。
+            </Text>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>04 / 14</Text>
+    </Box>
+  </Box>
+</Slide>

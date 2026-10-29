@@ -1,0 +1,96 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#2F4A2B', letterSpacing: 2, fontWeight: 'bold' }}>04　AI 判断一</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#2F4A2B' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 22, flexDirection: 'column' }}>
+      <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+        个体化靠提示词装配，不做微调
+      </Text>
+      <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6 }}>
+        同一个问题，"头晕"对 27 岁和 72 岁、对服降压药和不服药的人，答案是四件不同的事。
+      </Text>
+
+      <Box style={{ flexDirection: 'row', marginTop: 16 }}>
+        <Box style={{ width: 586, flexDirection: 'column' }}>
+          <Image src="assets/consult.png" style={{ width: 586, height: 408, objectFit: 'cover', borderRadius: 6, border: '1px solid #D8D4C4' }} />
+          <Text style={{ fontSize: 12, color: '#8B8A7E', marginTop: 8, lineHeight: 1.5 }}>
+            图 2　没有输入任何背景信息，回答里直接出现了患者姓名、年龄与在服药物
+          </Text>
+        </Box>
+
+        <Box style={{ flex: 1, flexDirection: 'column', paddingLeft: 28 }}>
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#2F4A2B', marginBottom: 10 }}>
+            每次对话前拼四样东西
+          </Text>
+
+          <Box style={{ flexDirection: 'row', alignItems: 'center', paddingBottom: 9 }}>
+            <Box style={{ width: 24, height: 24, borderRadius: 12, background: '#2F4A2B', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 13, color: '#FFFFFF', fontWeight: 'bold' }}>1</Text></Box>
+            <Text style={{ fontSize: 17, color: '#33352E', marginLeft: 12, flex: 1 }}>
+              档案：年龄 / 体型 / 血型 / 过敏史 / 病史 / 主诉
+            </Text>
+          </Box>
+          <Box style={{ flexDirection: 'row', alignItems: 'center', paddingBottom: 9 }}>
+            <Box style={{ width: 24, height: 24, borderRadius: 12, background: '#2F4A2B', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 13, color: '#FFFFFF', fontWeight: 'bold' }}>2</Text></Box>
+            <Text style={{ fontSize: 17, color: '#33352E', marginLeft: 12, flex: 1 }}>
+              在服药物：isActive 的药名、剂量、频次
+            </Text>
+          </Box>
+          <Box style={{ flexDirection: 'row', alignItems: 'center', paddingBottom: 9 }}>
+            <Box style={{ width: 24, height: 24, borderRadius: 12, background: '#2F4A2B', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 13, color: '#FFFFFF', fontWeight: 'bold' }}>3</Text></Box>
+            <Text style={{ fontSize: 17, color: '#33352E', marginLeft: 12, flex: 1 }}>
+              最近 3 条问诊摘要
+            </Text>
+          </Box>
+          <Box style={{ flexDirection: 'row', alignItems: 'center', paddingBottom: 14 }}>
+            <Box style={{ width: 24, height: 24, borderRadius: 12, background: '#2F4A2B', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 13, color: '#FFFFFF', fontWeight: 'bold' }}>4</Text></Box>
+            <Text style={{ fontSize: 17, color: '#33352E', marginLeft: 12, flex: 1 }}>
+              星标优先的 8 条结论卡片
+            </Text>
+          </Box>
+
+          <Box style={{
+            background: '#FAF7EF', borderLeft: '4px solid #2F4A2B', paddingTop: 11, paddingBottom: 11,
+            paddingLeft: 16, paddingRight: 16,
+          }}>
+            <Text style={{ fontSize: 16, color: '#2F4A2B', lineHeight: 1.6 }}>
+              token 靠三个上限恒定：历史 20 条 · 摘要 3 条 · 结论 8 条。
+              <span style={{ fontWeight: 'bold' }}>不随对话变长而失控。</span>
+            </Text>
+          </Box>
+
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#C0473C', marginTop: 16, marginBottom: 8 }}>
+            为什么不用微调
+          </Text>
+          <Box style={{ flexDirection: 'column', gap: 4 }}>
+            <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.55 }}>
+              · 微调改变的是"说话方式"，不是"记住某个人的过敏史"
+            </Text>
+            <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.55 }}>
+              · 患者今早刚加的青霉素过敏，下午的对话必须带上 —— 只有提示词做得到
+            </Text>
+            <Text style={{ fontSize: 16, color: '#33352E', lineHeight: 1.55 }}>
+              · 一个家庭的数据量根本不支持训练，也不该把健康数据拿去训模型
+            </Text>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>07 / 14</Text>
+    </Box>
+  </Box>
+</Slide>

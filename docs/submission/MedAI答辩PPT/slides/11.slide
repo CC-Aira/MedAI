@@ -1,0 +1,84 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: 0 }}>
+  <Box style={{ flexDirection: 'column', width: 1280, height: 720 }}>
+    <Box style={{
+      width: 1280, height: 44, background: '#F3F1E7', flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 15, color: '#2F4A2B', letterSpacing: 2, fontWeight: 'bold' }}>05　核心功能</Text>
+      <Text style={{ fontSize: 14, color: '#8B8A7E', letterSpacing: 2 }}>MedAI</Text>
+    </Box>
+    <Box style={{ width: 1280, height: 2, background: '#2F4A2B' }} />
+
+    <Box style={{ paddingLeft: 60, paddingRight: 60, paddingTop: 20, flexDirection: 'column' }}>
+      <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1C1F1A', fontFamily: 'Microsoft YaHei' }}>
+        复诊时，不用再凭记忆复述
+      </Text>
+      <Text style={{ fontSize: 17, color: '#55544A', marginTop: 6 }}>
+        三个月发生的事排成一条轴，能投影给医生看；一次问诊整理成一张 A4，能打印、能复制成纯文本。
+      </Text>
+
+      <Box style={{ flexDirection: 'row', marginTop: 14, gap: 20 }}>
+        <Box style={{ width: 660, flexDirection: 'column' }}>
+          <Image src="assets/timeline.png" style={{ width: 660, height: 370, objectFit: 'cover', borderRadius: 6, border: '1px solid #D8D4C4' }} />
+          <Text style={{ fontSize: 12, color: '#8B8A7E', marginTop: 7, lineHeight: 1.5 }}>
+            图 5　病程时间轴：建档、用药、问诊、结论排在同一条轴上，按真正发生的时间归日
+          </Text>
+          <Box style={{ flexDirection: 'column', marginTop: 10 }}>
+            <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#1C1F1A' }}>按"真发生时间"归日</Text>
+            <Text style={{ fontSize: 15, color: '#55544A', marginTop: 4, lineHeight: 1.55 }}>
+              用药看 startDate、问诊看 lastMessageAt，不看会被归档刷新的 updatedAt ——
+              否则整条轴会挤在最后一次操作的那天。
+            </Text>
+          </Box>
+        </Box>
+
+        <Box style={{ flex: 1, flexDirection: 'row', gap: 18 }}>
+          <Box style={{ width: 250, flexDirection: 'column' }}>
+            <Image src="assets/sheet.png" style={{ width: 250, height: 370, objectFit: 'cover', borderRadius: 6, border: '1px solid #D8D4C4' }} />
+            <Text style={{ fontSize: 12, color: '#8B8A7E', marginTop: 7, lineHeight: 1.5 }}>
+              图 6　就诊摘要 A4 单页
+            </Text>
+          </Box>
+
+          <Box style={{ flex: 1, flexDirection: 'column' }}>
+            <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#2F4A2B', marginBottom: 8 }}>这张纸上有什么</Text>
+            <Box style={{ flexDirection: 'column', gap: 6 }}>
+              <Text style={{ fontSize: 15, color: '#33352E', lineHeight: 1.5 }}>· 主诉与病程</Text>
+              <Text style={{ fontSize: 15, color: '#33352E', lineHeight: 1.5 }}>· 在服药物 + 过敏史</Text>
+              <Text style={{ fontSize: 15, color: '#33352E', lineHeight: 1.5 }}>· 现在可以先做什么</Text>
+              <Text style={{ fontSize: 15, color: '#33352E', lineHeight: 1.5 }}>· 什么情况必须就医</Text>
+              <Text style={{ fontSize: 15, color: '#33352E', lineHeight: 1.5 }}>· 想问医生的几个问题</Text>
+            </Box>
+            <Box style={{
+              marginTop: 12, background: '#FAF7EF', borderLeft: '4px solid #C0473C',
+              paddingTop: 9, paddingBottom: 9, paddingLeft: 12, paddingRight: 12,
+            }}>
+              <Text style={{ fontSize: 14, color: '#33352E', lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 'bold', color: '#C0473C' }}>模型不可用时退回本地模板</span>，
+                绝不给你一张空纸。
+              </Text>
+            </Box>
+            <Box style={{
+              marginTop: 10, background: '#FAF7EF', borderLeft: '4px solid #2F4A2B',
+              paddingTop: 9, paddingBottom: 9, paddingLeft: 12, paddingRight: 12,
+            }}>
+              <Text style={{ fontSize: 14, color: '#33352E', lineHeight: 1.5 }}>
+                纯文本版复制到微信，也不会丢掉过敏史与既往病史。
+              </Text>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+
+    <Box style={{
+      position: 'absolute', bottom: 0, left: 0, width: 1280, height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingLeft: 60, paddingRight: 60,
+    }}>
+      <Text style={{ fontSize: 13, color: '#8B8A7E' }}>广东医科大学 · MedAI</Text>
+      <Text style={{ fontSize: 13, color: '#2F4A2B' }}>11 / 14</Text>
+    </Box>
+  </Box>
+</Slide>
