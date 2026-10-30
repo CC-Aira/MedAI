@@ -62,6 +62,20 @@ if not exist "prisma\dev.db" (
         pause
         exit /b 1
     )
+
+    REM 空库没有任何账号，demo@medai.local 登录会直接失败。
+    REM 种子脚本会重建演示病人并重置演示账号密码，所以只在新库上跑一次。
+    echo   [..] Seeding demo data (accounts + patients + records)...
+    call npx tsx prisma/seed.ts
+    if errorlevel 1 (
+        echo.
+        echo   [X] Seeding failed. Run "npm run db:seed" manually to retry.
+        pause
+        exit /b 1
+    )
+    echo   [OK] Demo accounts ready:  demo@medai.local / Medai@2026
+    echo        Second account for isolation check:  other@medai.local / Medai@2026
+    echo.
 )
 
 if not exist ".next\BUILD_ID" (
