@@ -45,8 +45,9 @@ export async function POST(req: NextRequest) {
 
     const passwordHash = await hashPassword(password);
     const user = await prisma.user.create({
-      data: { email, passwordHash },
-      select: { id: true, email: true, createdAt: true },
+      // 注册只能建普通用户：管理员由 seed / 运维脚本创建，接口层面不给任何提权入口
+      data: { email, passwordHash, role: "user", lastLoginAt: new Date() },
+      select: { id: true, email: true, role: true, createdAt: true },
     });
 
     await setSessionCookie(user.id);

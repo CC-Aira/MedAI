@@ -1,5 +1,8 @@
 node_modules/
 .next/
+# 构建前为避开目录占用而重命名出来的旧产物
+.next-old/
+.next-keep*/
 out/
 build/
 next-env.d.ts

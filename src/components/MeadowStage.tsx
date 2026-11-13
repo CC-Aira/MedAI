@@ -96,12 +96,18 @@ export default function MeadowStage({
   email,
   counts,
   board: initialBoard,
+  isAdmin = false,
+  platformName = "MedAI",
 }: {
   initialPatients: Patient[];
   email: string;
   counts: { diseases: number; drugs: number };
   /** 草地上那块小木牌的内容：全家今天的用药 */
   board: TodayBoard;
+  /** 管理员才在顶栏显示「管理后台」入口 */
+  isAdmin?: boolean;
+  /** 后台「系统参数 → 平台名称」，改动后顶栏字样跟着变 */
+  platformName?: string;
 }) {
   const router = useRouter();
 
@@ -677,6 +683,11 @@ export default function MeadowStage({
 
   /* -------------------------------------------------------------- 聊天 */
 
+  /**
+   * 聊天区自动滚到底。
+   * facts / notice 也要进来：整理档案的候选面板是追加在对话最下面的，
+   * 只跟着 chat 滚的话，扫描回来用户还停在原来的位置，看着就像"点了没反应"。
+   */
   useEffect(() => {
     const log = logRef.current;
     if (!log) return;
@@ -684,7 +695,7 @@ export default function MeadowStage({
       log.scrollTop = log.scrollHeight;
     });
     return () => cancelAnimationFrame(id);
-  }, [chat]);
+  }, [chat, facts, notice]);
 
   const send = useCallback(
     async (
@@ -880,7 +891,11 @@ export default function MeadowStage({
   async function onApplyFacts() {
     if (!consultId || !facts || busyTool) return;
     const picked = facts.filter((f) => checked[f.id]);
-    if (picked.length === 0) return;
+    // 一条没勾就静默 return 的话，用户会以为是按钮坏了 —— 这里必须说清楚
+    if (picked.length === 0) {
+      setNotice("先勾选要写进档案的内容，再点「写进档案」。");
+      return;
+    }
 
     setBusyTool(true);
     setNotice(null);
@@ -1249,16 +1264,31 @@ export default function MeadowStage({
       {/* ============ 顶栏 ============ */}
       <header className="hud">
         <div className="wordmark">
-          <span className="wordmark__name">MedAI</span>
+          <span className="wordmark__name">{platformName}</span>
           <span className="wordmark__dot" />
           <span className="wordmark__tail">档案 · 科普 · 药品</span>
         </div>
 
         <div className="hud__actions">
+          {/* 只有管理员看得到：误点进来后还能回后台 */}
+          {isAdmin && (
+            <Link className="clay clay--pill hud__admin" href="/admin" title="平台数据与统计">
+              <span className="clay__text">管理后台</span>
+            </Link>
+          )}
+
           <Link className="clay clay--pill hud__new" href="/patients/new">
             <span className="clay__text">新建档案</span>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 5v14M5 12h14" />
+            </svg>
+          </Link>
+
+          {/* 「我的」：账号信息、切换账号、意见反馈 */}
+          <Link className="clay clay--icon" href="/me" title={`我的 · ${email}`}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="8.2" r="3.6" />
+              <path d="M5 20c.7-3.6 3.6-5.6 7-5.6s6.3 2 7 5.6" />
             </svg>
           </Link>
 
@@ -1602,6 +1632,12 @@ export default function MeadowStage({
               <p className="facts__title">
                 MedAI 从这次对话里读到 {facts.length} 条可以补进档案的内容
               </p>
+              {/* 冲突项默认不勾（要人自己判断），这里点明一下，免得一片空勾看着像没扫到 */}
+              {facts.some((f) => f.kind === "conflict") && (
+                <p className="facts__hint">
+                  「与档案不一致」的几条需要你自己确认，勾选后才会写入。
+                </p>
+              )}
               <ul className="facts__list">
                 {facts.map((f) => (
                   <li
@@ -1687,7 +1723,7 @@ export default function MeadowStage({
                 onClick={() => void onScanFacts()}
                 disabled={busyTool || sending}
               >
-                整理进档案
+                {busyTool ? "正在读这次对话…" : "整理进档案"}
               </button>
               <button
                 className="chip chip--tool chip--sheet"

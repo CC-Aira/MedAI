@@ -11,16 +11,22 @@ import { LIMITS } from "@/lib/constants";
 import { optionalText } from "@/lib/validate";
 import {
   askDeepSeek,
+  askVision,
   assertAiReady,
   readDeepSeekStream,
   type ChatMessage,
+  type VisionMessage,
 } from "@/lib/ai";
 import { buildChatContext, saveRedFlagTurn } from "@/lib/consult-flow";
 import { requireOwnedConsultation } from "@/lib/consultations";
 import { detectRedFlags } from "@/lib/red-flags";
-import { requireOwnedAttachment } from "@/lib/attachment-store";
+import {
+  readAttachmentBytes,
+  requireOwnedAttachment,
+} from "@/lib/attachment-store";
 import { purgeExpiredMessages, retentionCutoff } from "@/lib/retention";
 import { serializeMessage } from "@/lib/consultations";
+import { getAiRuntime } from "@/lib/settings";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -194,18 +200,61 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       excludeMessageId: editingId ?? undefined,
     });
 
+    // 后台「系统参数 / AI 模型配置」里的补充内容，拼在系统提示词后面。
+    // 放在这里而不是 buildSystemPrompt 里：那是个纯函数，读库会让它变成异步。
+    const runtime = await getAiRuntime();
+    const extra = [runtime.consultRules, runtime.promptExtra]
+      .filter((t) => t && t.trim())
+      .join("\n\n");
+    const systemWithExtra = extra ? `${system}\n\n【平台补充规则】\n${extra}` : system;
+
     // 6. 查配置：没配 Key 且没开演示模式就是 503，别去连上游
     assertAiReady();
 
+    // 本轮带了图片附件时，整轮切到视觉模型：直接把原图发过去。
+    // 文本模型（glm-4-flash）即使拿到注入的图片描述，也容易答"我看不到图片"。
+    let visionRequest: VisionMessage[] | null = null;
+    if (attachmentId) {
+      const row = await requireOwnedAttachment(user.id, attachmentId);
+      if (row.kind === "image" && row.storedName && visionRequest === null) {
+        try {
+          const { bytes } = await readAttachmentBytes(user.id, attachmentId);
+          const dataUrl = `data:${row.mimeType};base64,${bytes.toString("base64")}`;
+          const question = content.trim() || "请帮我看看这张图片里有什么，有没有需要注意的地方。";
+          visionRequest = [
+            { role: "system", content: systemWithExtra },
+            ...messages.slice(0, -1).map((m) => ({ role: m.role, content: m.content })),
+            {
+              role: "user" as const,
+              content: [
+                { type: "image_url" as const, image_url: { url: dataUrl } },
+                { type: "text" as const, text: question },
+              ],
+            },
+          ];
+        } catch (err) {
+          // 读原图失败不拦对话：退回文本模型 + 注入描述的老路
+          console.error("[medai] 读取原图失败，退回文本模型", err);
+        }
+      }
+    }
+
     const payload: ChatMessage[] = [
-      { role: "system", content: system },
+      { role: "system", content: systemWithExtra },
       ...messages,
     ];
-    const upstream = await askDeepSeek({
-      messages: payload,
-      temperature: 0.6,
-      maxTokens: 900,
-    });
+    const upstream = visionRequest
+      ? await askVision({
+          messages: visionRequest,
+          temperature: runtime.temperature,
+          maxTokens: runtime.maxTokens,
+        })
+      : await askDeepSeek({
+          messages: payload,
+          temperature: runtime.temperature,
+          maxTokens: runtime.maxTokens,
+          model: runtime.model,
+        });
 
     const encoder = new TextEncoder();
     let full = "";

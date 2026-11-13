@@ -1,13 +1,16 @@
 import Link from "next/link";
+import { getPlatformName } from "@/lib/settings";
 
 /** 科普库与药品库共用的外壳：同一套天空背景 + 顶部切换 */
-export default function KnowledgeShell({
+export default async function KnowledgeShell({
   children,
   active,
 }: {
   children: React.ReactNode;
   active: "library" | "drugs";
 }) {
+  const platformName = await getPlatformName();
+
   return (
     <div className="sheetwrap">
       <div className="sheetwrap__sky" aria-hidden="true" />
@@ -36,7 +39,15 @@ export default function KnowledgeShell({
           </Link>
         </div>
 
-        <span className="sheetwrap__brand">MedAI</span>
+        <Link className="sheetwrap__me" href="/me" title="账号与意见反馈">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8.2" r="3.6" />
+            <path d="M5 20c.7-3.6 3.6-5.6 7-5.6s6.3 2 7 5.6" />
+          </svg>
+          我的
+        </Link>
+
+        <span className="sheetwrap__brand">{platformName}</span>
       </nav>
 
       <main className="kbase">{children}</main>

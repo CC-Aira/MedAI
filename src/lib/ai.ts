@@ -3,17 +3,25 @@ import { HttpError } from "./http";
 export type ChatRole = "system" | "user" | "assistant";
 export type ChatMessage = { role: ChatRole; content: string };
 
+/** 多模态消息：content 可以是纯文本，也可以是 图 + 文 的数组 */
+export type VisionContentPart =
+  | { type: "text"; text: string }
+  | { type: "image_url"; image_url: { url: string } };
+export type VisionMessage = { role: ChatRole; content: string | VisionContentPart[] };
+
 export type AskOptions = {
   messages: ChatMessage[];
   temperature?: number;
   maxTokens?: number;
+  /** 覆盖模型名（后台「AI 模型配置」里填了就用它，留空走 .env） */
+  model?: string | null;
   /** 要求模型返回 JSON（response_format: json_object）。提示词里必须出现 "json" 字样 */
   json?: boolean;
   signal?: AbortSignal;
 };
 
-const DEFAULT_BASE_URL = "https://api.deepseek.com";
-const DEFAULT_MODEL = "deepseek-flash";
+const DEFAULT_BASE_URL = "https://open.bigmodel.cn/api/paas/v4";
+const DEFAULT_MODEL = "glm-4-flash";
 
 function baseUrl(): string {
   return (process.env.DEEPSEEK_BASE_URL || DEFAULT_BASE_URL).replace(/\/+$/, "");
@@ -35,6 +43,109 @@ export function aiConfigured(): boolean {
 /** 没配 Key 时的本地模拟模式，只在显式开启时生效 */
 export function aiDemoMode(): boolean {
   return process.env.MEDAI_DEMO_AI === "1";
+}
+
+/* ------------------------------------------------------------ 视觉模型 */
+
+const DEFAULT_VISION_BASE_URL = "https://open.bigmodel.cn/api/paas/v4";
+const DEFAULT_VISION_MODEL = "glm-4v-flash";
+
+function visionBaseUrl(): string {
+  return (process.env.VISION_BASE_URL || DEFAULT_VISION_BASE_URL).replace(/\/+$/, "");
+}
+
+function visionModel(): string {
+  return process.env.VISION_MODEL || DEFAULT_VISION_MODEL;
+}
+
+function visionApiKey(): string {
+  return (process.env.VISION_API_KEY || "").trim();
+}
+
+/** 视觉模型是否可用（配了 VISION_API_KEY 才算） */
+export function visionConfigured(): boolean {
+  return visionApiKey().length > 0;
+}
+
+/** 视觉模型单次调用的整体超时：图片 + 多模态，比纯文本慢一些 */
+const VISION_TIMEOUT_MS = 30_000;
+
+/**
+ * 让视觉模型客观描述一张图片，把结果交给文本模型当"眼睛"。
+ *
+ * 边界：这里只做客观描述（图里有什么、什么颜色、什么形态、有没有文字），
+ * 绝不下诊断、不做医学判断、不给建议 —— 那些交给文本模型按红线约束去做。
+ *
+ * 失败静默降级：视觉模型没配、超时、报错，一律返回空串，
+ * 图片仍走 OCR 文字提取这条老路，整条链路不会因此 500。
+ */
+export async function describeImage(buffer: Buffer, mimeType: string): Promise<string> {
+  if (!visionConfigured()) {
+    if (aiDemoMode()) return demoVision(mimeType);
+    return "";
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), VISION_TIMEOUT_MS);
+
+  try {
+    const dataUrl = `data:${mimeType};base64,${buffer.toString("base64")}`;
+    const res = await fetch(`${visionBaseUrl()}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${visionApiKey()}`,
+      },
+      body: JSON.stringify({
+        model: visionModel(),
+        messages: [
+          {
+            role: "system",
+            content:
+              "你是医疗场景下的图像描述助手。请用中文客观、克制地描述图片里能看到的内容：主体、颜色、形态、大小关系、以及图中出现的任何文字。只描述事实，不要下诊断，不要做医学判断，不要给任何建议。",
+          },
+          {
+            role: "user",
+            content: [
+              { type: "image_url", image_url: { url: dataUrl } },
+              { type: "text", text: "请客观描述这张图片里有什么。" },
+            ],
+          },
+        ],
+        stream: false,
+        max_tokens: 600,
+        temperature: 0.3,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const detail = (await res.text().catch(() => "")).slice(0, 300);
+      console.error(`[medai] 视觉模型返回 ${res.status}${detail ? `：${detail}` : ""}`);
+      return "";
+    }
+
+    const data = (await res.json()) as {
+      choices?: { message?: { content?: unknown } }[];
+    };
+    const content = data.choices?.[0]?.message?.content;
+    if (typeof content !== "string") return "";
+    return content.trim();
+  } catch (err) {
+    if ((err as Error)?.name === "AbortError") {
+      console.error("[medai] 视觉模型超时，降级为纯 OCR");
+    } else {
+      console.error("[medai] 视觉模型调用失败", err);
+    }
+    return "";
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** 无 Key 时的视觉占位描述：让"看图"这条链路也能在演示模式下走通 */
+function demoVision(mimeType: string): string {
+  return `（演示模式）这是一张 ${mimeType} 图片，尚未配置视觉模型（VISION_API_KEY），无法真正看图。正式使用时，这里会是对图片内容的客观描述。`;
 }
 
 /**
@@ -63,7 +174,9 @@ const FIRST_BYTE_TIMEOUT_MS = 90_000;
  * 调用方自己传了 signal（用户点了停止）时以调用方为准，不叠加 ——
  * 那时中止是我们的意图，应该原样抛出，不当成故障。
  */
-async function postChat(
+async function postChatTo(
+  endpoint: string,
+  key: string,
   payload: Record<string, unknown>,
   signal?: AbortSignal,
 ): Promise<Response> {
@@ -72,11 +185,11 @@ async function postChat(
 
   let res: Response;
   try {
-    res = await fetch(`${baseUrl()}/chat/completions`, {
+    res = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey()}`,
+        Authorization: `Bearer ${key}`,
       },
       body: JSON.stringify(payload),
       signal: signal ?? guard?.signal,
@@ -87,7 +200,7 @@ async function postChat(
       if (guard) throw new HttpError(504, "AI 服务一直没有响应（等了 90 秒），请重试");
       throw err;
     }
-    throw new HttpError(502, "连不上 DeepSeek，请检查网络或代理设置");
+    throw new HttpError(502, "连不上 AI 服务，请检查网络或代理设置");
   } finally {
     if (timer) clearTimeout(timer);
   }
@@ -96,11 +209,18 @@ async function postChat(
     const detail = (await res.text().catch(() => "")).slice(0, 300);
     // 401/403 是 Key 的问题，别把上游原文整段回吐给前端
     if (res.status === 401 || res.status === 403) {
-      throw new HttpError(503, "DEEPSEEK_API_KEY 无效或已过期");
+      throw new HttpError(503, "API Key 无效或已过期");
     }
-    throw new HttpError(502, `DeepSeek 返回 ${res.status}${detail ? `：${detail}` : ""}`);
+    throw new HttpError(502, `上游返回 ${res.status}${detail ? `：${detail}` : ""}`);
   }
   return res;
+}
+
+async function postChat(
+  payload: Record<string, unknown>,
+  signal?: AbortSignal,
+): Promise<Response> {
+  return postChatTo(`${baseUrl()}/chat/completions`, apiKey(), payload, signal);
 }
 
 /**
@@ -108,7 +228,7 @@ async function postChat(
  * 演示模式下返回一条同协议的本地模拟流，方便无 Key 时跑通全链路。
  */
 export async function askDeepSeek(options: AskOptions): Promise<Response> {
-  const { messages, temperature = 0.6, maxTokens = 900, json = false, signal } = options;
+  const { messages, temperature = 0.6, maxTokens = 900, json = false, signal, model: modelOverride } = options;
 
   if (!aiConfigured()) {
     if (!aiDemoMode()) {
@@ -118,7 +238,7 @@ export async function askDeepSeek(options: AskOptions): Promise<Response> {
   }
 
   const payload: Record<string, unknown> = {
-    model: model(),
+    model: (modelOverride || model()).trim(),
     messages,
     stream: true,
     temperature,
@@ -134,7 +254,14 @@ export async function askDeepSeek(options: AskOptions): Promise<Response> {
 
 /** 一次性调用（摘要、整理档案这类不需要逐字显示的活儿） */
 export async function askDeepSeekOnce(options: AskOptions): Promise<string> {
-  const { messages, temperature = 0.3, maxTokens = 900, json = false, signal } = options;
+  const {
+    messages,
+    temperature = 0.3,
+    maxTokens = 900,
+    json = false,
+    signal,
+    model: modelOverride,
+  } = options;
 
   if (!aiConfigured()) {
     if (!aiDemoMode()) {
@@ -144,7 +271,7 @@ export async function askDeepSeekOnce(options: AskOptions): Promise<string> {
   }
 
   const payload: Record<string, unknown> = {
-    model: model(),
+    model: (modelOverride || model()).trim(),
     messages,
     stream: false,
     temperature,
@@ -163,6 +290,39 @@ export async function askDeepSeekOnce(options: AskOptions): Promise<string> {
     throw new HttpError(502, "DeepSeek 返回了空内容");
   }
   return content;
+}
+
+/**
+ * 带图片的对话：把原图直接交给视觉模型（glm-4v-flash 这类），
+ * 流式返回，协议和文本模型一致，readDeepSeekStream 可以直接复用。
+ *
+ * 为什么不让文本模型读注入的图片描述：glm-4-flash 对"图片"二字有很强的
+ * 条件反射，哪怕描述就写在提示词里，它也会答"我看不到图片"。
+ * 所以本轮带了图片附件时，整轮对话切到视觉模型。
+ */
+export async function askVision(options: {
+  messages: VisionMessage[];
+  temperature?: number;
+  maxTokens?: number;
+}): Promise<Response> {
+  const { messages, temperature = 0.6, maxTokens = 900 } = options;
+
+  if (!visionConfigured()) {
+    throw new HttpError(503, "视觉模型未配置（VISION_API_KEY），无法看图回答");
+  }
+
+  const payload: Record<string, unknown> = {
+    model: visionModel(),
+    messages,
+    stream: true,
+    temperature,
+    max_tokens: maxTokens,
+  };
+  return postChatTo(
+    `${visionBaseUrl()}/chat/completions`,
+    visionApiKey(),
+    payload,
+  );
 }
 
 /* ------------------------------------------------------------ 解析流 */

@@ -131,22 +131,33 @@ async function collectPromptAttachments(
     filename: string;
     kind: string;
     text: string;
+    visionText?: string | null;
   }) => {
     if (seen.has(row.id) || picked.length >= MAX_ATTACHMENTS_IN_PROMPT) return;
-    const text = row.text.trim();
-    if (!text) return; // 没读出字的附件不进提示词，避免模型凭空猜
+    const text = (row.text || "").trim();
+    const vision = (row.visionText || "").trim();
+    // 既没读出字、也没有视觉描述，不进提示词，避免模型凭空猜
+    if (!text && !vision) return;
     seen.add(row.id);
     picked.push({
       filename: row.filename,
       kind: row.kind,
       text: text.slice(0, PROMPT_ATTACH_CHARS),
+      visionText: vision.slice(0, PROMPT_ATTACH_CHARS),
     });
   };
 
   if (currentIds.length > 0) {
     const rows = await prisma.attachment.findMany({
       where: { id: { in: currentIds }, ownerId },
-      select: { id: true, filename: true, kind: true, text: true, createdAt: true },
+      select: {
+        id: true,
+        filename: true,
+        kind: true,
+        text: true,
+        visionText: true,
+        createdAt: true,
+      },
       orderBy: { createdAt: "asc" },
     });
     rows.forEach(push);
@@ -162,7 +173,7 @@ async function collectPromptAttachments(
       take: MAX_ATTACHMENTS_IN_PROMPT,
       select: {
         attachment: {
-          select: { id: true, filename: true, kind: true, text: true },
+          select: { id: true, filename: true, kind: true, text: true, visionText: true },
         },
       },
     });

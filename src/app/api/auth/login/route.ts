@@ -46,19 +46,47 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { id: true, email: true, passwordHash: true, createdAt: true },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        passwordHash: true,
+        disabled: true,
+        createdAt: true,
+      },
     });
 
     const valid = user ? await verifyPassword(password, user.passwordHash) : false;
     if (!user || !valid) throw new HttpError(401, "邮箱或密码不对");
+
+    // 先验密码再看停用状态：顺序反了就等于告诉别人"这个邮箱存在但被停用了"
+    if (user.disabled) {
+      throw new HttpError(403, "这个账号已被停用，请联系平台管理员");
+    }
 
     // 输对了：两个计数一起清空，之前的失败不该继续压着他
     resetRateLimit(ipKey);
     resetRateLimit(accountKey);
 
     await setSessionCookie(user.id);
+
+    // 登录时间给后台"最近活跃"用；写失败不该让人登不进来，单独兜住
+    try {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() },
+      });
+    } catch (err) {
+      console.error("[medai] 记录登录时间失败", err);
+    }
+
     return ok({
-      user: { id: user.id, email: user.email, createdAt: user.createdAt },
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role === "admin" ? "admin" : "user",
+        createdAt: user.createdAt,
+      },
     });
   } catch (err) {
     return toErrorResponse(err);

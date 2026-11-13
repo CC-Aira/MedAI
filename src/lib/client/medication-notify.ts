@@ -161,7 +161,8 @@ export function notifySupportHint(state: NotifyPermission): string {
     case "unsupported":
       return "这个浏览器不支持系统通知（或不是 https / localhost），提醒只在页面里显示";
     case "denied":
-      return "通知权限被拒绝了，去浏览器地址栏左边的站点设置里改回「允许」";
+      // 拒绝过之后浏览器不会再弹询问框，必须说清"去哪里改"，否则点开关像坏了
+      return "通知权限之前被拒绝了，浏览器不会再弹询问框 —— 点地址栏左侧的 🔒（或 ⓘ）图标，把「通知」改成「允许」，然后回来再点一次「开启」";
     case "default":
       return "开启后，到点会弹一条系统通知";
     case "granted":

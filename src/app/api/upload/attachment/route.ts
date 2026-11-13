@@ -7,8 +7,8 @@ import { createAttachment } from "@/lib/attachment-store";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** OCR 是 CPU 活，给足时间，别让默认超时把上传掐断 */
-export const maxDuration = 60;
+/** OCR 是 CPU 活，视觉模型调用还要等网络，给足时间，别让默认超时把上传掐断 */
+export const maxDuration = 120;
 
 /**
  * POST /api/upload/attachment

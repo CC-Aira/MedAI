@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { getPlatformName } from "@/lib/settings";
 
 /** 表单类页面的外壳：静态渐变背景 + 返回入口 + 居中纸面 */
-export default function SheetShell({
+export default async function SheetShell({
   children,
   backHref = "/",
   backLabel = "回到小兔子",
@@ -10,6 +11,8 @@ export default function SheetShell({
   backHref?: string;
   backLabel?: string;
 }) {
+  const platformName = await getPlatformName();
+
   return (
     <div className="sheetwrap">
       <div className="sheetwrap__sky" aria-hidden="true" />
@@ -22,7 +25,7 @@ export default function SheetShell({
           </svg>
           {backLabel}
         </Link>
-        <span className="sheetwrap__brand">MedAI</span>
+        <span className="sheetwrap__brand">{platformName}</span>
       </nav>
 
       {children}

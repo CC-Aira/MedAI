@@ -1,6 +1,7 @@
 import { prisma } from "./db";
 import { HttpError } from "./http";
 import { LIMITS } from "./constants";
+import { describeImage } from "./ai";
 import {
   extractAttachmentText,
   readAttachmentFile,
@@ -79,6 +80,17 @@ export async function createAttachment(
   const { storedName, sizeBytes } = await saveAttachmentFile(buffer, sniffed.ext);
   const { text, note } = await extractAttachmentText(buffer, sniffed.kind, filename);
 
+  // 图片额外走视觉模型"看图"，生成客观描述（纯图像 OCR 读不出字时靠它）。
+  // 非图片不碰视觉；视觉模型没配 / 失败时返回空串，静默降级为纯 OCR。
+  let visionText = "";
+  let finalNote = note;
+  if (sniffed.kind === "image") {
+    visionText = (await describeImage(buffer, sniffed.mimeType)).slice(0, LIMITS.attachText);
+    if (visionText && !text.trim()) {
+      finalNote = "图片，已用视觉模型读取图中内容";
+    }
+  }
+
   const row = await prisma.attachment.create({
     data: {
       ownerId,
@@ -87,11 +99,12 @@ export async function createAttachment(
       sizeBytes,
       kind: sniffed.kind,
       text,
+      visionText,
       storedName,
     },
   });
 
-  return serializeAttachment(row, note);
+  return serializeAttachment(row, finalNote);
 }
 
 /** 附件按 owner 隔离：别人的附件一律当作不存在 */

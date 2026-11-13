@@ -30,18 +30,30 @@ const ago = (days: number, hour = 10) => {
 
 const DEMO_EMAIL = "demo@medai.local";
 const OTHER_EMAIL = "other@medai.local";
+const ADMIN_EMAIL = "admin@medai.local";
+/** 管理员密码单独一套，不和演示账号共用 */
+const ADMIN_PASSWORD = "Admin@2026";
 const PASSWORD = "Medai@2026";
 
 async function main() {
   const passwordHash = await hashPassword(PASSWORD);
 
+  // 管理员：固定账号，role 写死 admin。注册接口永远只建 user，
+  // 所以"谁能在后台看数据"这条线只有这里能开
+  const adminHash = await hashPassword(ADMIN_PASSWORD);
+  await prisma.user.upsert({
+    where: { email: ADMIN_EMAIL },
+    create: { email: ADMIN_EMAIL, passwordHash: adminHash, role: "admin" },
+    update: { passwordHash: adminHash, role: "admin" },
+  });
+
   for (const email of [DEMO_EMAIL, OTHER_EMAIL]) {
     const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
     if (!existing) {
-      await prisma.user.create({ data: { email, passwordHash } });
+      await prisma.user.create({ data: { email, passwordHash, role: "user" } });
     } else {
       // 密码固定，方便反复重置
-      await prisma.user.update({ where: { email }, data: { passwordHash } });
+      await prisma.user.update({ where: { email }, data: { passwordHash, role: "user" } });
     }
   }
 
@@ -317,9 +329,184 @@ async function main() {
     },
   });
 
+  /* ------------------------------- 更多注册用户（给后台统计凑样本） */
+  // 这些账号只为了让管理员后台的"用户数 / 活跃度 / 排行"有真实分布，
+  // 每人一个档案、一到两次问诊，没有用药跟踪（依从率只按真实的打卡算）
+  const extraUsers: {
+    email: string;
+    daysAgo: number;
+    name: string;
+    gender: string;
+    age: number;
+    complaint: string;
+    consults: { title: string; daysAgo: number; messages: [string, string][] }[];
+  }[] = [
+    {
+      email: "zhouyu@medai.local",
+      daysAgo: 26,
+      name: "周瑜",
+      gender: "female",
+      age: 29,
+      complaint: "反复失眠一个月",
+      consults: [
+        {
+          title: "最近总是睡不着",
+          daysAgo: 4,
+          messages: [
+            ["躺下两小时都睡不着，白天还没精神。", "躺很久睡不着，越着急越清醒，这是很多人都会遇到的循环。先问两点：这种情况持续多久了，白天有没有补觉或喝咖啡？"],
+            ["一个月了，下午会喝一杯咖啡。", "下午的咖啡因到晚上还有一半留在身体里。这两周先把咖啡挪到中午前，睡前一小时把手机放下。如果两周后还这样，建议去睡眠门诊看看。"],
+          ],
+        },
+      ],
+    },
+    {
+      email: "liangchen@medai.local",
+      daysAgo: 18,
+      name: "梁晨",
+      gender: "male",
+      age: 36,
+      complaint: "膝盖运动后疼痛",
+      consults: [
+        {
+          title: "跑步后膝盖外侧疼",
+          daysAgo: 11,
+          messages: [
+            ["跑完五公里之后膝盖外侧疼，上下楼梯更明显。", "外侧疼、上下楼加重，常见于髂胫束相关的刺激。先确认：疼的时候有没有肿、有没有卡住或打软腿的感觉？"],
+            ["没肿，也不打软腿，就是酸胀。", "那先别加量。这两周把跑量减一半，跑完做臀部和大腿外侧的放松；如果出现肿胀、关节卡住或者夜里也疼，就要去骨科看一下。"],
+          ],
+        },
+        {
+          title: "膝盖还是不舒服",
+          daysAgo: 3,
+          messages: [
+            ["休息了一周，感觉好一些了，能恢复跑步吗？", "可以，但别直接回到原来的量。按每周增加一成的原则慢慢加，跑前热身、跑后拉伸都别省。"],
+          ],
+        },
+      ],
+    },
+    {
+      email: "sunqi@medai.local",
+      daysAgo: 12,
+      name: "孙琪",
+      gender: "female",
+      age: 24,
+      complaint: "经期腹痛明显",
+      consults: [
+        {
+          title: "每次来月经都疼得厉害",
+          daysAgo: 6,
+          messages: [
+            ["每次月经第一天都疼得要吃止痛药，这样正常吗？", "很多人的痛经确实会到需要止痛药的程度，但不等于只能忍着。先问两点：疼是第一天最重还是整个经期都疼？有没有伴随经量特别多或者非经期出血？"],
+            ["第一天最重，量正常，没有别的地方出血。", "那更像是原发性痛经。可以热敷下腹、提前一点用药；如果疼到影响上班上学，或者吃药也不缓解，建议去妇科做个评估，别自己一直硬扛。"],
+          ],
+        },
+      ],
+    },
+    {
+      email: "wupeng@medai.local",
+      daysAgo: 7,
+      name: "吴鹏",
+      gender: "male",
+      age: 45,
+      complaint: "体检发现血脂偏高",
+      consults: [
+        {
+          title: "血脂高需要吃药吗",
+          daysAgo: 2,
+          messages: [
+            ["体检说低密度脂蛋白偏高，要不要马上吃药？", "先别急着吃药，但也别放着不管。要看你具体高多少、有没有高血压糖尿病、家里有没有早发心血管病的病史。能把这些数字发我吗？"],
+          ],
+        },
+      ],
+    },
+    {
+      email: "hexy@medai.local",
+      daysAgo: 3,
+      name: "何晓月",
+      gender: "female",
+      age: 31,
+      complaint: "咽喉不适",
+      consults: [],
+    },
+  ];
+
+  for (const u of extraUsers) {
+    const existing = await prisma.user.findUnique({
+      where: { email: u.email },
+      select: { id: true },
+    });
+    const user = existing
+      ? await prisma.user.update({
+          where: { email: u.email },
+          data: {
+            passwordHash,
+            role: "user",
+            lastLoginAt: ago(Math.max(0, u.daysAgo - 2)),
+          },
+        })
+      : await prisma.user.create({
+          data: {
+            email: u.email,
+            passwordHash,
+            role: "user",
+            createdAt: ago(u.daysAgo),
+            lastLoginAt: ago(Math.max(0, u.daysAgo - 2)),
+          },
+        });
+
+    // seed 可重复执行：先把这个账号名下的档案清掉再建
+    await prisma.patient.deleteMany({ where: { ownerId: user.id } });
+
+    const patient = await prisma.patient.create({
+      data: {
+        ownerId: user.id,
+        name: u.name,
+        gender: u.gender,
+        age: u.age,
+        chiefComplaint: u.complaint,
+        createdAt: ago(u.daysAgo),
+        updatedAt: ago(Math.max(0, u.daysAgo - 1)),
+      },
+    });
+
+    for (const c of u.consults) {
+      const consult = await prisma.consultation.create({
+        data: {
+          patientId: patient.id,
+          title: c.title,
+          status: "active",
+          createdAt: ago(c.daysAgo, 20),
+          updatedAt: ago(c.daysAgo, 21),
+        },
+      });
+      let hour = 20;
+      for (const [userText, aiText] of c.messages) {
+        await prisma.message.create({
+          data: {
+            consultationId: consult.id,
+            role: "user",
+            content: userText,
+            createdAt: ago(c.daysAgo, hour),
+          },
+        });
+        await prisma.message.create({
+          data: {
+            consultationId: consult.id,
+            role: "assistant",
+            content: aiText,
+            createdAt: ago(c.daysAgo, hour),
+          },
+        });
+        hour += 1;
+      }
+    }
+  }
+
   console.log("seed 完成：");
+  console.log(`  管理员   ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}（可登录 /admin 看统计）`);
   console.log(`  主账号   ${DEMO_EMAIL} / ${PASSWORD}（6 份档案）`);
   console.log(`  对照账号 ${OTHER_EMAIL} / ${PASSWORD}（1 份档案，用于越权测试）`);
+  console.log(`  样本用户 ${extraUsers.length} 个，密码同为 ${PASSWORD}`);
 }
 
 main()

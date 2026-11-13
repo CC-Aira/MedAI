@@ -99,9 +99,22 @@ export default function PatientDetail({
   const [reminder, setReminder] = useState<{ id: string; data: MedicationReminder } | null>(null);
   const [reminderBusy, setReminderBusy] = useState<string | null>(null);
 
+  /** 行内编辑：正在改哪一条药，以及表单内容 */
+  const [editingMed, setEditingMed] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    dosage: "",
+    frequency: "",
+    timeOfDay: "08:00",
+    mealTiming: "after",
+    courseDays: "",
+    note: "",
+  });
+
   /* -------------------------------------------------- 到点提醒（浏览器通知） */
   const [notifyOn, setNotifyOn] = useState(false);
   const [perm, setPerm] = useState<NotifyPermission>("default");
+  /** 点了开启但没开成的提示（权限被拒时浏览器不会弹框，必须在这里说清楚） */
+  const [notifyError, setNotifyError] = useState<string | null>(null);
 
   // localStorage 和 Notification 只有浏览器里有，挂载后再读
   useEffect(() => {
@@ -109,12 +122,27 @@ export default function PatientDetail({
     setNotifyOn(isReminderEnabled());
     setPerm(notifyPermission());
     /* eslint-enable react-hooks/set-state-in-effect */
+
+    /**
+     * 用户去站点设置里把通知改回「允许」后切回来，这里自动同步状态 ——
+     * 不然组件里的 perm 还停在 denied，得手动刷新页面才能看到变化。
+     */
+    function syncPerm() {
+      setPerm(notifyPermission());
+    }
+    window.addEventListener("focus", syncPerm);
+    document.addEventListener("visibilitychange", syncPerm);
+    return () => {
+      window.removeEventListener("focus", syncPerm);
+      document.removeEventListener("visibilitychange", syncPerm);
+    };
   }, []);
 
   async function toggleNotify() {
     if (notifyOn) {
       setReminderEnabled(false);
       setNotifyOn(false);
+      setNotifyError(null);
       return;
     }
     // 申请权限必须发生在点击里，否则浏览器直接拒绝
@@ -123,6 +151,14 @@ export default function PatientDetail({
     if (next === "granted") {
       setReminderEnabled(true);
       setNotifyOn(true);
+      setNotifyError(null);
+      return;
+    }
+    if (next === "denied") {
+      // 浏览器对拒绝过的站点不会再弹询问框：不提示的话这个按钮看起来就是坏的
+      setNotifyError(notifySupportHint("denied"));
+    } else if (next === "unsupported") {
+      setNotifyError(notifySupportHint("unsupported"));
     }
   }
 
@@ -157,6 +193,46 @@ export default function PatientDetail({
       });
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "没加上，请再试一次");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** 打开某条药的行内编辑表单 */
+  function startEditMed(m: Medication) {
+    setEditingMed(m.id);
+    setReminder(null); // 提醒文案面板和编辑面板互斥，别同时展开两个
+    setEditForm({
+      dosage: m.dosage ?? "",
+      frequency: m.frequency ?? "",
+      timeOfDay: m.timeOfDay ?? "",
+      mealTiming: m.mealTiming ?? "any",
+      courseDays: m.courseDays === null ? "" : String(m.courseDays),
+      note: m.note ?? "",
+    });
+  }
+
+  /** 保存行内编辑：只提交出现过的字段，服务端做部分更新 */
+  async function saveEditMed(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingMed || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const { medications } = await patchMedication(editingMed, {
+        dosage: editForm.dosage.trim(),
+        frequency: editForm.frequency.trim(),
+        timeOfDay: editForm.timeOfDay, // 空串表示清掉时间点
+        mealTiming: editForm.mealTiming,
+        courseDays: editForm.courseDays.trim(),
+        note: editForm.note.trim(),
+      });
+      setMeds(medications);
+      // 改了时间/疗程后提醒文案里的事实也变了，展开着的要作废
+      if (reminder?.id === editingMed) setReminder(null);
+      setEditingMed(null);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "没改成功，请再试一次");
     } finally {
       setBusy(false);
     }
@@ -434,6 +510,11 @@ export default function PatientDetail({
                   ? "到点会弹系统通知，点一下通知就记作已服用（页面需要开着）"
                   : notifySupportHint(perm)}
               </span>
+              {notifyError && !notifyOn && (
+                <span className="mednotify__alert" role="alert">
+                  {notifyError}
+                </span>
+              )}
             </div>
             <button
               className={`mednotify__btn${notifyOn ? " is-on" : ""}`}
@@ -529,7 +610,10 @@ export default function PatientDetail({
               const when = scheduleLabel(m.timeOfDay, m.mealTiming);
               const opened = reminder?.id === m.id;
               return (
-                <li className={`med${opened ? " is-open" : ""}`} key={m.id}>
+                <li
+                  className={`med${opened ? " is-open" : ""}${editingMed === m.id ? " is-editing" : ""}`}
+                  key={m.id}
+                >
                   <div className="med__body">
                     <b className="med__name">{m.drugName}</b>
                     <span className="med__dose">
@@ -560,6 +644,14 @@ export default function PatientDetail({
                     <button
                       className="med__remind"
                       type="button"
+                      onClick={() => (editingMed === m.id ? setEditingMed(null) : startEditMed(m))}
+                      disabled={busy}
+                    >
+                      {editingMed === m.id ? "收起" : "修改"}
+                    </button>
+                    <button
+                      className="med__remind"
+                      type="button"
                       onClick={() => void showReminder(m)}
                       disabled={reminderBusy === m.id}
                     >
@@ -572,6 +664,87 @@ export default function PatientDetail({
                       删除
                     </button>
                   </div>
+
+                  {editingMed === m.id && (
+                    <form className="mededit" onSubmit={saveEditMed}>
+                      <label className="field">
+                        <span className="field__label">单次剂量</span>
+                        <input
+                          className="field__input"
+                          value={editForm.dosage}
+                          onChange={(e) => setEditForm({ ...editForm, dosage: e.target.value })}
+                          maxLength={30}
+                          placeholder="5mg"
+                        />
+                      </label>
+                      <label className="field">
+                        <span className="field__label">频率</span>
+                        <input
+                          className="field__input"
+                          value={editForm.frequency}
+                          onChange={(e) => setEditForm({ ...editForm, frequency: e.target.value })}
+                          maxLength={30}
+                          placeholder="每日一次"
+                        />
+                      </label>
+                      <label className="field">
+                        <span className="field__label">时间点</span>
+                        <input
+                          className="field__input"
+                          type="time"
+                          value={editForm.timeOfDay}
+                          onChange={(e) => setEditForm({ ...editForm, timeOfDay: e.target.value })}
+                        />
+                      </label>
+                      <label className="field">
+                        <span className="field__label">饭前 / 饭后</span>
+                        <select
+                          className="field__input"
+                          value={editForm.mealTiming}
+                          onChange={(e) => setEditForm({ ...editForm, mealTiming: e.target.value })}
+                        >
+                          <option value="before">饭前</option>
+                          <option value="after">饭后</option>
+                          <option value="any">不限</option>
+                        </select>
+                      </label>
+                      <label className="field">
+                        <span className="field__label">疗程（天）</span>
+                        <input
+                          className="field__input"
+                          type="number"
+                          min={1}
+                          max={365}
+                          value={editForm.courseDays}
+                          onChange={(e) => setEditForm({ ...editForm, courseDays: e.target.value })}
+                          placeholder="7"
+                        />
+                      </label>
+                      <label className="field mededit__wide">
+                        <span className="field__label">备注</span>
+                        <input
+                          className="field__input"
+                          value={editForm.note}
+                          onChange={(e) => setEditForm({ ...editForm, note: e.target.value })}
+                          maxLength={100}
+                          placeholder="医生嘱咐"
+                        />
+                      </label>
+                      <div className="mededit__acts mededit__wide">
+                        <button className="clay clay--pill mededit__save" type="submit" disabled={busy}>
+                          <span className="clay__text">{busy ? "保存中…" : "保存修改"}</span>
+                        </button>
+                        <button
+                          className="mededit__cancel"
+                          type="button"
+                          onClick={() => setEditingMed(null)}
+                          disabled={busy}
+                        >
+                          不改了
+                        </button>
+                      </div>
+                    </form>
+                  )}
 
                   {opened && reminder && (
                     <div className="remind">

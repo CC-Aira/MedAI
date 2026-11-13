@@ -15,9 +15,18 @@ model User {
   id           String       @id @default(cuid())
   email        String       @unique
   passwordHash String // scrypt$salt$hash，永不存明文
+  /// 角色：user = 个人用户，admin = 管理员。SQLite 没有 enum，靠应用层白名单校验。
+  role         String       @default("user")
+  /// 最近一次登录成功的时间；从没登录过就是 null
+  lastLoginAt  DateTime?
+  /// 账号是否被停用：停用后无法登录，但数据保留
+  disabled     Boolean      @default(false)
   createdAt    DateTime     @default(now())
   patients     Patient[]
   attachments  Attachment[]
+  feedbacks    Feedback[]
+
+  @@index([role, createdAt])
 }
 
 model Patient {
@@ -140,6 +149,8 @@ model Attachment {
   kind      String // image | pdf | docx | text
   /// 提取出的正文；图片没识别出字就是空串
   text      String    @default("")
+  /// 视觉模型对图片的客观描述（纯图像 OCR 读不出字时靠它）
+  visionText String   @default("")
   /// 磁盘上的文件名（服务器生成），读取走 /api/attachments/[id]/raw
   storedName String?
   createdAt DateTime  @default(now())
@@ -161,4 +172,76 @@ model Note {
   createdAt      DateTime      @default(now())
 
   @@index([patientId, isFavorite, createdAt])
+}
+
+/// 后台公告：登录后展示给用户的通知。置顶的排前面。
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  /// 是否置顶
+  pinned    Boolean  @default(false)
+  /// 是否启用；停用后前台不再展示
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([enabled, pinned, createdAt])
+}
+
+/// 后台操作日志：谁在什么时候动了什么，用于审计与追溯
+model AdminLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actorEmail String
+  /// 动作标识，如 user.disable / announcement.create / settings.update
+  action     String
+  /// 操作对象的一句话描述
+  target     String
+  /// 补充详情（已做过脱敏，不放密码、不放对话原文）
+  detail     String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([action, createdAt])
+}
+
+/// 系统配置：键值对。后台「系统参数 / AI 模型配置」都写这里。
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+/**
+ * 用户反馈：在「我的」页面提交的问题、建议、内容纠错。
+ *
+ * 与问诊记录不同，**这里的内容是用户主动写给管理员看的**，
+ * 后台可以直接读原文 —— 不放对话、不放档案数据，只放用户自己敲的字。
+ */
+model Feedback {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// 类型：bug（用不了）| suggest（提建议）| content（内容有错）| other
+  kind    String @default("suggest")
+  /// 用户写的内容正文
+  content String
+  /// 用户自愿留下的联系方式（邮箱/微信都可），可为空
+  contact String?
+  /// 满意度评分 1~5，可为空
+  rating  Int?
+  /// 从哪个页面提交的，便于定位问题
+  page    String?
+  /// 处理状态：open（待处理）| read（已看）| done（已处理）
+  status  String @default("open")
+  /// 管理员的回复，用户在自己的「我的」页面能看到
+  reply   String?
+  /// 标记为已处理的时间
+  handledAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
 }

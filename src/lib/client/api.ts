@@ -71,6 +71,42 @@ export const register = (email: string, password: string) =>
 
 export const logout = () => api<{ ok: boolean }>("/api/auth/logout", { method: "POST" });
 
+/* ------------------------------------------------------------------ 反馈 */
+
+export type FeedbackItem = {
+  id: string;
+  kind: string;
+  content: string;
+  contact: string | null;
+  rating: number | null;
+  page: string | null;
+  status: string;
+  reply: string | null;
+  createdAt: string;
+  handledAt: string | null;
+  userEmail?: string;
+};
+
+export const listMyFeedback = () => api<{ feedback: FeedbackItem[] }>("/api/feedback");
+
+export const submitFeedback = (body: {
+  kind: string;
+  content: string;
+  contact?: string;
+  rating?: number | null;
+  page?: string;
+}) =>
+  api<{ feedback: FeedbackItem }>("/api/feedback", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
+export const patchFeedback = (id: string, body: { status?: string; reply?: string }) =>
+  api<{ feedback: FeedbackItem }>(`/api/admin/feedback/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+
 /* ------------------------------------------------------------------ 档案 */
 
 export const listPatients = () => api<{ patients: Patient[] }>("/api/patients");

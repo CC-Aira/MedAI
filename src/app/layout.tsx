@@ -1,13 +1,22 @@
 import type { Metadata, Viewport } from "next";
 import MedicationReminderWatcher from "@/components/MedicationReminderWatcher";
+import { getPlatformName } from "@/lib/settings";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "MedAI — 草地上的小兔子 · 档案与问诊",
-  description:
-    "MedAI：草地上一只认真听你说话的小兔子。每一分身体状况，都值得被认真回应。",
-  icons: { icon: "/favicon.svg" },
-};
+/** 浏览器标签页标题也用后台配置的平台名；各子页自己的 title 不受影响 */
+export async function generateMetadata(): Promise<Metadata> {
+  let name = "MedAI";
+  try {
+    name = await getPlatformName();
+  } catch {
+    // 构建期静态生成时可能连不上库，回落默认名，绝不能让标签页标题把页面弄挂
+  }
+  return {
+    title: `${name} — 草地上的小兔子 · 档案与问诊`,
+    description: `${name}：草地上一只认真听你说话的小兔子。每一分身体状况，都值得被认真回应。`,
+    icons: { icon: "/favicon.svg" },
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",

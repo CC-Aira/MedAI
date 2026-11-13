@@ -58,6 +58,13 @@ export default async function DrugPage({ params }: Props) {
 
   return (
     <KnowledgeShell active="drugs">
+      <Link className="doc__back" href="/drugs">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6l-6 6 6 6" />
+        </svg>
+        返回药品说明
+      </Link>
+
       <article className="detail doc">
         <header className="doc__head">
           <div className="doc__badge">
@@ -205,22 +212,24 @@ export default async function DrugPage({ params }: Props) {
         </footer>
       </article>
 
-      {sameCat.length > 0 && (
-        <section className="doc__more">
-          <p className="doc__more-title">同类药物</p>
-          <div className="doc__more-list">
-            {sameCat.map((s) => (
-              <Link key={s.slug} className="doc__more-item" href={`/drugs/${s.slug}`}>
-                <b>{s.genericName}</b>
-                <span>{s.otc ? "OTC" : "Rx"}</span>
-              </Link>
-            ))}
-          </div>
-          <Link className="doc__backall" href="/drugs">
-            ← 回到药品说明查询
-          </Link>
-        </section>
-      )}
+      <section className="doc__more">
+        {sameCat.length > 0 && (
+          <>
+            <p className="doc__more-title">同类药物</p>
+            <div className="doc__more-list">
+              {sameCat.map((s) => (
+                <Link key={s.slug} className="doc__more-item" href={`/drugs/${s.slug}`}>
+                  <b>{s.genericName}</b>
+                  <span>{s.otc ? "OTC" : "Rx"}</span>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
+        <Link className="doc__backall" href="/drugs">
+          ← 回到药品说明查询
+        </Link>
+      </section>
     </KnowledgeShell>
   );
 }

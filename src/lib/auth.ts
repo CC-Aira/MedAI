@@ -9,11 +9,19 @@ export { hashPassword, verifyPassword } from "./password";
 export const SESSION_COOKIE = "medai_session";
 export const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
 
+export type UserRole = "user" | "admin";
+
 export type SessionUser = {
   id: string;
   email: string;
+  role: UserRole;
   createdAt: Date;
 };
+
+/** 库里 role 是自由字符串（SQLite 没 enum），白名单之外的都当普通用户 */
+function toRole(raw: string | null | undefined): UserRole {
+  return raw === "admin" ? "admin" : "user";
+}
 
 /* ------------------------------------------------------------- 会话 token */
 
@@ -123,9 +131,11 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
 
   const user = await prisma.user.findUnique({
     where: { id: payload.uid },
-    select: { id: true, email: true, createdAt: true },
+    select: { id: true, email: true, role: true, disabled: true, createdAt: true },
   });
-  return user ?? null;
+  // 账号被停用后，已经发出去的旧 token 立刻作废 —— 否则停用只是"下次登不进来"
+  if (!user || user.disabled) return null;
+  return { id: user.id, email: user.email, role: toRole(user.role), createdAt: user.createdAt };
 }
 
 /**
@@ -135,4 +145,22 @@ export async function requireUser(): Promise<SessionUser> {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   return user;
+}
+
+/**
+ * 管理员页面用：没登录去登录页，登录了但不是管理员就去首页。
+ *
+ * 不能给 404 或空白页 —— 普通用户误点到 /admin，看到一片白只会以为是坏了。
+ */
+export async function requireAdmin(): Promise<SessionUser> {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login?role=admin");
+  if (user.role !== "admin") redirect("/");
+  return user;
+}
+
+/** 接口用：非管理员返回 null，由调用方决定回 401 还是 403 */
+export async function getCurrentAdmin(): Promise<SessionUser | null> {
+  const user = await getCurrentUser();
+  return user && user.role === "admin" ? user : null;
 }

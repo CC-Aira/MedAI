@@ -57,9 +57,11 @@ const ensureTuned: Promise<void> =
   (async () => {
     if (!isSqlite) return;
     try {
-      await prisma.$executeRawUnsafe("PRAGMA journal_mode = WAL");
+      // journal_mode / busy_timeout 这两条 PRAGMA 会**返回一行结果**（当前值），
+      // 用 $executeRawUnsafe 会抛 P2010 “Execute returned results”，必须走 $queryRawUnsafe。
+      await prisma.$queryRawUnsafe("PRAGMA journal_mode = WAL");
       // 写锁被别人占着时最多等 5 秒再报错；默认是 0，一撞就抛
-      await prisma.$executeRawUnsafe("PRAGMA busy_timeout = 5000");
+      await prisma.$queryRawUnsafe("PRAGMA busy_timeout = 5000");
       // WAL 下 NORMAL 已经足够安全（断电最多丢最后一个事务），比 FULL 快很多
       await prisma.$executeRawUnsafe("PRAGMA synchronous = NORMAL");
       // 外键约束 Prisma 自己会开，这里显式声明一次，直连库调试时也一致

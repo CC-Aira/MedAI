@@ -173,4 +173,10 @@ export type TodayBoard = {
   entries: BoardEntry[];
 };
 
-export type SessionUser = { id: string; email: string; createdAt: string };
+export type SessionUser = {
+  id: string;
+  email: string;
+  /** 账号角色：普通用户 / 管理员。老接口不返回时按 user 处理 */
+  role?: "user" | "admin";
+  createdAt: string;
+};

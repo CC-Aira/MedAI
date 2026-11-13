@@ -3,6 +3,7 @@ import path from "node:path";
 import { redirect } from "next/navigation";
 import LoginForm from "@/components/LoginForm";
 import { getCurrentUser } from "@/lib/auth";
+import { getSettings, getPlatformName } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
@@ -27,13 +28,39 @@ function readBuildId(): string | undefined {
 /** 演示账号：只在 MEDAI_DEMO_LOGIN=1 时才把入口交给前端 */
 const DEMO_EMAIL = "demo@medai.local";
 const DEMO_PASSWORD = "Medai@2026";
+/** 管理员演示账号：和 seed 里的固定管理员一致 */
+const ADMIN_DEMO_EMAIL = "admin@medai.local";
+const ADMIN_DEMO_PASSWORD = "Admin@2026";
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ role?: string; email?: string }>;
+}) {
   const user = await getCurrentUser();
-  if (user) redirect("/");
-  const demo =
-    process.env.MEDAI_DEMO_LOGIN === "1"
-      ? { email: DEMO_EMAIL, password: DEMO_PASSWORD }
-      : null;
-  return <LoginForm build={readBuildId()} demo={demo} />;
+  // 已登录的管理员直接进后台；已登录的普通用户回首页
+  if (user) redirect(user.role === "admin" ? "/admin" : "/");
+
+  const { role, email } = await searchParams;
+  const demoEnabled = process.env.MEDAI_DEMO_LOGIN === "1";
+  const demo = demoEnabled ? { email: DEMO_EMAIL, password: DEMO_PASSWORD } : null;
+  const adminDemo = demoEnabled
+    ? { email: ADMIN_DEMO_EMAIL, password: ADMIN_DEMO_PASSWORD }
+    : null;
+
+  // 平台名 / 提示语 / 联系方式都来自后台「系统参数」，改完刷新登录页就能看到
+  const [platformName, settings] = await Promise.all([getPlatformName(), getSettings()]);
+
+  return (
+    <LoginForm
+      build={readBuildId()}
+      demo={demo}
+      adminDemo={adminDemo}
+      initialRole={role === "admin" ? "admin" : "user"}
+      initialEmail={typeof email === "string" ? email : undefined}
+      platformName={platformName}
+      notice={settings["platform.notice"]?.trim() || undefined}
+      contact={settings["platform.contact"]?.trim() || undefined}
+    />
+  );
 }
