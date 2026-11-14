@@ -328,6 +328,7 @@ SQLite 单文件，`prisma/dev.db`。`src/lib/db.ts` 在装配时做了两件容
 
 ## 文档索引
 
+- `docs/开发过程记录.md` —— 按日期记录的真实迭代过程、设计取舍与踩坑
 - `docs/submission/技术文档.pdf` —— 参赛技术文档（22 页，按官方七段式组织）
 - `docs/submission/演示视频脚本.md` —— 演示视频分镜与旁白
 - `docs/deploy.md` —— 三条部署路线、备份与恢复
