@@ -25,6 +25,7 @@ model User {
   patients     Patient[]
   attachments  Attachment[]
   feedbacks    Feedback[]
+  labReports   LabReport[]
 
   @@index([role, createdAt])
 }
@@ -49,6 +50,7 @@ model Patient {
   medications    Medication[]
   consultations  Consultation[]
   notes          Note[]
+  labReports     LabReport[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -244,4 +246,32 @@ model Feedback {
 
   @@index([status, createdAt])
   @@index([userId, createdAt])
+}
+
+/// 一份化验单（血常规 / 生化 / 尿常规……），由视觉模型从照片里抽成结构化指标。
+/// 指标整体存 JSON 字符串而不是拆表：单子上项目的名称与参考区间千差万别，
+/// 拆成 Item 表只会得到一张靠 name 字符串关联、还要处理单位不一致的松散表。
+model LabReport {
+  id           String   @id @default(cuid())
+  ownerId      String
+  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  patientId    String
+  patient      Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  /// 原始单据附件，可为空（手输 / 附件被清理后仍保留结构化结果）
+  attachmentId String?
+  /// 采样日期：模型从单子上读，读不到用上传时间
+  takenAt      DateTime
+  /// 医院 / 体检机构，读不到就是空串
+  hospital     String   @default("")
+  /// 单据类型：血常规 / 肝功能 / 肾功能 / 血脂 / 尿常规 / 其他
+  kind         String   @default("其他")
+  /// [{ name, value, unit, refText, abnormal }]，abnormal: high | low | ""
+  items        String   @default("[]")
+  /// 模型对这份单子的客观归纳（不提诊断，只描述哪些项异常）
+  summary      String   @default("")
+  /// 异常项数量：列表页排序与「有没有变差」的判断都靠它
+  abnormalCount Int     @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([ownerId, patientId, takenAt])
 }

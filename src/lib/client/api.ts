@@ -15,6 +15,7 @@ import type {
 } from "./types";
 // 就诊摘要的结构定义在 lib 里，那一份文件只放类型和纯函数，浏览器侧可以直接用
 import type { VisitSheet } from "../visit-sheet";
+import type { LabReportDTO } from "../lab-report";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -270,6 +271,24 @@ export const patchNote = (id: string, body: Record<string, unknown>) =>
 export const deleteNote = (id: string) =>
   api<{ notes: Note[] }>(`/api/notes/${id}`, { method: "DELETE" });
 
+/* ---------------------------------------------------------------- 化验单 */
+
+export const listLabReports = (patientId: string) =>
+  api<{ reports: LabReportDTO[] }>(`/api/patients/${patientId}/lab-reports`);
+
+/**
+ * 抽取要等视觉模型，可能十几秒。前端不用 abort 逻辑 —— 让请求跑完，
+ * 用户切走再回来也能看到结果，比一个"已取消"友好。
+ */
+export const extractLabReport = (patientId: string, attachmentId: string) =>
+  api<{ report: LabReportDTO; reports: LabReportDTO[] }>(
+    `/api/patients/${patientId}/lab-reports`,
+    { method: "POST", body: JSON.stringify({ attachmentId }) },
+  );
+
+export const deleteLabReport = (id: string) =>
+  api<{ deleted: boolean }>(`/api/lab-reports/${id}`, { method: "DELETE" });
+
 /* ------------------------------------------------------------------ 其他 */
 
 export const getGrowth = () => api<{ growth: Growth }>("/api/growth");
@@ -301,6 +320,15 @@ export const uploadAttachment = async (file: File) => {
 
 /* ------------------------------------------------------------- 流式问诊 */
 
+export type ToolTrace = {
+  name: string;
+  /** 人话标签，例如「查询今日用药」 */
+  label: string;
+  status: "running" | "done";
+  detail?: string;
+  ms?: number;
+};
+
 export type StreamHandlers = {
   onDelta: (text: string) => void;
   onDone: (payload: {
@@ -310,6 +338,10 @@ export type StreamHandlers = {
     messages: Message[];
   }) => void;
   onError: (message: string) => void;
+  /** 回答开始前的阶段提示（"正在结合档案梳理"） */
+  onStatus?: (text: string) => void;
+  /** 模型调用工具的过程，用来显示"正在查今日用药"这类状态 */
+  onTool?: (event: ToolTrace) => void;
 };
 
 export type StreamOptions = {
@@ -374,6 +406,16 @@ export async function streamMessage(
       const type = payload.type;
       if (type === "delta" && typeof payload.text === "string") {
         handlers.onDelta(payload.text);
+      } else if (type === "status" && typeof payload.text === "string") {
+        handlers.onStatus?.(payload.text);
+      } else if (type === "tool" && typeof payload.name === "string") {
+        handlers.onTool?.({
+          name: payload.name,
+          label: typeof payload.label === "string" ? payload.label : payload.name,
+          status: payload.status === "done" ? "done" : "running",
+          detail: typeof payload.detail === "string" ? payload.detail : undefined,
+          ms: typeof payload.ms === "number" ? payload.ms : undefined,
+        });
       } else if (type === "done") {
         handlers.onDone({
           userMessage: (payload.userMessage as Message | null) ?? null,

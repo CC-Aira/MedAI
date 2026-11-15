@@ -133,11 +133,11 @@
     <li><span class="sec">02</span><span>需求分析</span><span class="dots"></span><span class="pg" data-p="02">5</span></li>
     <li><span class="sec">03</span><span>系统架构设计</span><span class="dots"></span><span class="pg" data-p="03">7</span></li>
     <li><span class="sec">04</span><span>AI 技术方案</span><span class="dots"></span><span class="pg" data-p="04">10</span></li>
-    <li><span class="sec">05</span><span>核心功能实现</span><span class="dots"></span><span class="pg" data-p="05">14</span></li>
-    <li><span class="sec">06</span><span>创新点说明</span><span class="dots"></span><span class="pg" data-p="06">18</span></li>
-    <li><span class="sec">07</span><span>测试与部署</span><span class="dots"></span><span class="pg" data-p="07">20</span></li>
-    <li><span class="sec">08</span><span>总结与展望</span><span class="dots"></span><span class="pg" data-p="08">22</span></li>
-    <li><span class="sec">附</span><span>附录：引用说明 · 运行方式 · 演示账号</span><span class="dots"></span><span class="pg" data-p="附">25</span></li>
+    <li><span class="sec">05</span><span>核心功能实现</span><span class="dots"></span><span class="pg" data-p="05">15</span></li>
+    <li><span class="sec">06</span><span>创新点说明</span><span class="dots"></span><span class="pg" data-p="06">20</span></li>
+    <li><span class="sec">07</span><span>测试与部署</span><span class="dots"></span><span class="pg" data-p="07">22</span></li>
+    <li><span class="sec">08</span><span>总结与展望</span><span class="dots"></span><span class="pg" data-p="08">24</span></li>
+    <li><span class="sec">附</span><span>附录：引用说明 · 运行方式 · 演示账号</span><span class="dots"></span><span class="pg" data-p="附">28</span></li>
   </ol>
 
   <div class="note" style="margin-top:20pt">
@@ -151,10 +151,10 @@
     <tr><th style="width:26%">项目速览</th><th>内容</th></tr>
     <tr><td>形态</td><td>Web 应用（桌面 / 移动端响应式），可离线私有化部署；含用户端与管理端</td></tr>
     <tr><td>技术栈</td><td>Next.js 16 + React 19 + TypeScript 5.9 + Three.js 0.170 + Prisma 6 + SQLite</td></tr>
-    <tr><td>AI 能力</td><td>智谱 GLM-4-Flash 流式问诊 + GLM-4V-Flash 看图问诊（双模型按需路由）+ 个体化提示词装配 + 11 条本地红旗规则 + 事实核对 + 管理端配置热生效</td></tr>
+    <tr><td>AI 能力</td><td>智谱 GLM-4-Flash 流式问诊 + GLM-4V-Flash 看图问诊（双模型按需路由）+ 个体化提示词装配 + <b>5 个只读工具的 Function Calling</b> + <b>BM25 检索增强与引用脚注</b> + 11 条本地红旗规则 + 事实核对 + 化验单结构化 + 管理端配置热生效；同一批工具另经 <b>MCP</b> 导出</td></tr>
     <tr><td>内容规模</td><td>90 条疾病科普 · 73 种药品说明 · 13 个科室 · 18 组自绘 SVG 插图</td></tr>
-    <tr><td>代码规模</td><td>约 2.9 万行（TS / TSX / JS，不含依赖与构建产物）· 31 个 API 路由</td></tr>
-    <tr><td>自检覆盖</td><td>接口 68 项 · 木牌 33 项 · 提醒 20 项 · 登录 18 项 · 入口 8 项，全部通过</td></tr>
+    <tr><td>代码规模</td><td>约 3.1 万行（TS / TSX / JS，不含依赖与构建产物）· 33 个 API 路由</td></tr>
+    <tr><td>自检覆盖</td><td>接口 68 项 · 木牌 33 项 · 提醒 20 项 · 登录 18 项 · 入口 8 项 + 意图门控 9 例 · 检索命中 · 5 个工具实机调用 · MCP 握手与工具调用 · 化验单抽取与对比，全部通过</td></tr>
   </table>
 </section>
 
@@ -290,7 +290,7 @@
 
   <h3>2.2 功能需求</h3>
   <p>
-    上面五类问题拆成 9 组功能需求（FR-1 ～ FR-7 面向用户，FR-8 ～ FR-9 面向平台运营者）。优先级里 P0 是"不做就等于没做"，
+    上面五类问题拆成 10 组功能需求（FR-1 ～ FR-7 与 FR-10 面向用户，FR-8 ～ FR-9 面向平台运营者）。优先级里 P0 是"不做就等于没做"，
     P1 是"没有它产品不完整"，P2 是"有更好"。
   </p>
   <table>
@@ -302,13 +302,15 @@
     <tr><td>FR-3</td><td>用药与打卡</td><td class="c">P0</td>
         <td>用药计划（药名、剂量、频次、起止日期）；今日待服清单；打卡与撤销；全家用药板一屏呈现</td></tr>
     <tr><td>FR-4</td><td>AI 问诊</td><td class="c">P0</td>
-        <td>流式对话；回答必须结合档案与在服药物；带图轮次自动切视觉模型读原图；高危症状必须被拦截并给出就医指引；不出现诊断与处方</td></tr>
+        <td>流式对话；回答必须结合档案与在服药物；能查实时数据（今日用药 / 依从率 / 药物相互作用 / 科普库 / 历史问诊），查到的事实要标出处；带图轮次自动切视觉模型读原图；高危症状必须被拦截并给出就医指引；不出现诊断与处方</td></tr>
     <tr><td>FR-5</td><td>科普库</td><td class="c">P1</td>
         <td>疾病与药品检索；疾病含检查项目与常见误区；药品含起效时间、漏服处理、储存条件</td></tr>
     <tr><td>FR-6</td><td>就诊材料</td><td class="c">P1</td>
         <td>病程时间轴；就诊摘要（可打印、可复制纯文本）；复诊日历</td></tr>
     <tr><td>FR-7</td><td>资料上传</td><td class="c">P2</td>
         <td>化验单 / 处方照片 / PDF / Word 上传；本地 OCR；文本可作为对话附件上下文</td></tr>
+    <tr><td>FR-10</td><td>化验单管理</td><td class="c">P1</td>
+        <td>拍照或 PDF 上传后抽出指标（名称 / 结果 / 单位 / 参考区间）；自动标出超出参考区间的项；与上一份同类单据逐项对比（在好转 / 在变差 / 新增项）；可删除</td></tr>
     <tr><td>FR-8</td><td>管理后台</td><td class="c">P1</td>
         <td>数据看板（总览 / 问诊报表 / AI 效果监控）；患者管理（检索、启用禁用、重置密码）；问诊记录只读；AI 模型与系统参数配置；公告管理；操作日志</td></tr>
     <tr><td>FR-9</td><td>用户反馈</td><td class="c">P1</td>
@@ -343,7 +345,7 @@
   <p>
     整体是"单页壳 + 服务端路由 + 一层 AI 适配"的结构。用户端浏览器侧只有一片草地和一个问诊面板，
     状态集中在 <code>MeadowStage.tsx</code>；管理端是同仓库下的 <code>/admin</code> 控制台与
-    <code>/me</code> 个人中心；服务端 31 个 API 路由按
+    <code>/me</code> 个人中心；服务端 33 个 API 路由按
     <b>"校验输入 → 认门 → 查配置 → 干活"</b>的固定顺序处理，任何一步不过就直接返回。
   </p>
 
@@ -361,7 +363,7 @@
     <div class="arch__row">
       <div class="arch__label">接口层</div>
       <div class="arch__box">
-        31 个 Route Handler：<code>/api/auth</code> · <code>/api/patients</code> ·
+        33 个 Route Handler：<code>/api/auth</code> · <code>/api/patients</code> · <code>/api/patients/[id]/lab-reports</code> ·
         <code>/api/medications</code> · <code>/api/consultations</code> ·
         <code>/api/attachments</code> · <code>/api/notes</code> · <code>/api/growth</code> ·
         <code>/api/feedback</code> · <code>/api/admin/*</code><br />
@@ -378,6 +380,10 @@
         <b>事实核对</b>（<code>facts.ts</code>）·
         <b>排程与依从性</b>（<code>medication-schedule.ts</code>）·
         <b>摘要生成</b>（<code>visit-sheet.ts</code>，纯函数）·
+        <b>检索</b>（<code>rag.ts</code>，中文 bigram + BM25）·
+        <b>工具</b>（<code>tools.ts</code> 5 个只读查询）·
+        <b>Agent</b>（<code>agent.ts</code> 意图门控 + 两轮循环 + 引用编号）·
+        <b>化验单</b>（<code>lab-report.ts</code> 异常判定与逐项对比，纯函数）·
         <b>统计聚合</b>（<code>admin-stats.ts</code>，分科推断与 AI 指标全部由真实数据算出）
       </div>
     </div>
@@ -385,9 +391,10 @@
     <div class="arch__row">
       <div class="arch__label">AI 适配层</div>
       <div class="arch__box arch__box--ai">
-        <b><code>lib/ai.ts</code></b>：OpenAI 兼容协议封装 · 流式与非流式共用一条通路 ·
-        90 秒首包超时 · 换厂商只改环境变量<br />
-        业务代码不直接 <code>fetch</code> 模型，这一层是唯一的出口
+        <b><code>lib/ai.ts</code></b>：OpenAI 兼容协议封装 · 流式 / 非流式 / 视觉 / Function Calling 共用一条通路 ·
+        90 秒首包超时 · 参数服务端夹紧 · 换厂商只改环境变量<br />
+        业务代码不直接 <code>fetch</code> 模型，这一层是唯一的出口；
+        同一批工具另经 <code>scripts/mcp-server.ts</code> 以 <b>MCP stdio</b> 对外提供（只读）
       </div>
     </div>
     <div class="arch__arrow">↓</div>
@@ -433,7 +440,12 @@
     <tr><td><code>lib/medication-schedule.ts</code></td><td>排程展开与依从性计算，漏服封顶 7 天</td></tr>
     <tr><td><code>lib/knowledge-search.ts</code></td><td>中文检索：归一化 + 多词 AND + 字段权重打分</td></tr>
     <tr><td><code>components/meadow/engine.js</code></td><td>3D 场景：地形、实例草、绒球医生、木牌布局与投影</td></tr>
-    <tr><td><code>lib/ai.ts</code></td><td>模型调用的唯一出口（含视觉调用与运行时参数）</td></tr>
+    <tr><td><code>lib/ai.ts</code></td><td>模型调用的唯一出口（流式 / 一次性 / 视觉 / Function Calling / 运行时参数），视觉调用的 <code>max_tokens</code> 在这一层夹到上游允许的上限</td></tr>
+    <tr><td><code>lib/rag.ts</code></td><td>中文 bigram + BM25 检索 163 条科普条目，含字段权重、命中阈值与引用脚注格式</td></tr>
+    <tr><td><code>lib/tools.ts</code></td><td>5 个只读工具的声明（JSON Schema）与执行器，对话与 MCP 共用同一份</td></tr>
+    <tr><td><code>lib/agent.ts</code></td><td>意图门控 + 最多两轮的工具循环 + 引用编号表；决策失败即降级</td></tr>
+    <tr><td><code>lib/lab-report.ts</code> / <code>lab-extract.ts</code> / <code>lab-store.ts</code></td><td>化验单：抽取提示词与解析、异常判定与逐项对比（纯函数）、落库与「较上次」装配</td></tr>
+    <tr><td><code>scripts/mcp-server.ts</code></td><td>把同一批工具以 MCP stdio 导出，只读、按 ownerId 隔离</td></tr>
     <tr><td><code>lib/settings.ts</code></td><td>键值配置（Setting 表 + 10 秒缓存），管理端改模型参数 / 问诊规则立即生效；API Key 只从 .env 读并掩码展示，不入库</td></tr>
     <tr><td><code>lib/admin-stats.ts</code> / <code>admin-log.ts</code></td><td>后台统计聚合（分科推断、AI 指标）与审计日志写入（失败不影响主流程）</td></tr>
     <tr><td><code>lib/feedback.ts</code></td><td>用户反馈的提交、限流、管理端处理与回复</td></tr>
@@ -445,7 +457,7 @@
     <tr><td>User</td><td>email · passwordHash · role · disabled · lastLoginAt</td><td>账号，所有数据的根；role 区分用户 / 管理员，disabled 停用后旧会话立即失效</td></tr>
     <tr><td>Patient</td><td>name · gender · birthday · allergy · history · chiefComplaint</td><td>家庭档案，一个账号可多份</td></tr>
     <tr><td>Medication</td><td>name · dose · frequency · startDate · isActive · reminderAt</td><td>在服药物与提醒时间</td></tr>
-    <tr><td>CheckIn</td><td>medicationId · dateKey · takenAt</td><td>一天一次打卡，(medicationId, dateKey) 唯一，重复打卡幂等</td></tr>
+    <tr><td>MedicationLog</td><td>medicationId · dateKey · action · at</td><td>一天一次打卡，(medicationId, dateKey) 唯一，重复打卡幂等</td></tr>
     <tr><td>Consultation</td><td>status · lastMessageAt · summary</td><td>一次问诊会话，关闭时归档</td></tr>
     <tr><td>Message</td><td>role · content · flag · attachmentId</td><td>红旗消息把 <code>redflag.&lt;kind&gt;</code> 写进 flag，刷新后仍红</td></tr>
     <tr><td>Note</td><td>content · starred</td><td>结论卡片，只有患者能建</td></tr>
@@ -454,6 +466,7 @@
     <tr><td>Announcement</td><td>title · body · pinned · enabled</td><td>平台公告，支持置顶与启停</td></tr>
     <tr><td>AdminLog</td><td>actorId · action · target · detail</td><td>后台关键操作的审计记录</td></tr>
     <tr><td>Setting</td><td>key · value</td><td>系统配置键值对（平台名称、问诊规则、模型参数等）；密钥不入库</td></tr>
+    <tr><td>LabReport</td><td>takenAt · kind · items(JSON) · abnormalCount · summary</td><td>一份化验单的结构化结果；指标存 JSON 而不拆表 —— 项目名与参考区间千差万别，拆表只会得到一张靠字符串关联的松散表</td></tr>
   </table>
 </section>
 
@@ -476,30 +489,60 @@
     所以路线是：<em>通用模型 + 结构化事实装配 + 硬约束提示词</em>。
   </p>
 
-  <h4>（2）为什么没上向量 RAG</h4>
+  <h4>（2）为什么检索用 BM25，而不是上向量库</h4>
   <p>
-    科普库是 90 条疾病 + 73 种药品的<b>结构化条目</b>，不是长文档。
-    这类语料的关键是"准确命中条目"，而中文病名的检索难点在别名与错别字
-    （"胃食管反流"与"烧心"、"甲亢"与"甲状腺功能亢进"），不在语义近似。
-    我们用"全半角与简繁归一 + 同义词映射 + 多词 AND + 字段权重打分"解决了命中问题：
-    病名权重高于症状描述，命中病名即置顶。<em>零依赖、可解释、结果稳定</em>,
-    比引入 embedding 模型和向量库更划算 —— 后者还会带来一个几百 MB 的运行时依赖，
-    与"离线可部署"这条非功能需求冲突。
+    科普库是 90 条疾病 + 73 种药品的<b>短文本结构化条目</b>，不是长文档。
+    这类语料的查询有两种：一种是"高血压""阿莫西林"这种直接点名的，
+    另一种是"吃了这个药能不能喝酒"这种带着口语表述的。前者靠精确命中，
+    后者靠关键词共现 —— 两种都不需要"语义泛化"。
+  </p>
+  <p>
+    我们的做法是<b>中文二元组（bigram）+ BM25 + 字段权重</b>：
+    不引词典、不切词，按相邻两字切分（"高血压"→ 高血 / 血压），
+    这恰好绕开了中文分词器最麻烦的歧义问题；病名与药名的权重是正文的 3 倍，
+    命中条目名即置顶；再叠一层别名映射（"烧心"→ 胃食管反流、"甲亢"→ 甲状腺功能亢进）
+    与全半角、简繁归一。<em>零依赖、可解释、结果稳定</em> —— 同样一句问法，
+    今天和明天的检索结果一样，这在医疗语境里比"偶尔更聪明"重要。
+  </p>
+  <p>
+    检索结果不是整段塞进提示词：命中 3 条以内，每条只取标题、分类与三条要点，
+    并且<b>在注入时编号</b>，要求模型引用时写 <code>[1]</code>；回答末尾由代码
+    补一段"参考资料"，编号与注入时完全一致（见 4.4 的引用登记表）。
+    检索为空时不硬凑 —— 明确告诉模型"科普库没有覆盖，请说明这一点"，不让它拿常识冒充出处。
   </p>
   <div class="note">
-    <b>这一点在文档里说清楚，比含糊地说"实现了 RAG"更重要。</b>
-    我们没有做向量检索，做的是检索增强的关键词方案；检索结果作为事实注入提示词，
-    模型在此基础上组织语言。它的增强效果来自"命中准"，而不是"语义泛化"。
+    <b>什么时候会上向量检索：</b>条目涨到上千条，或者要检索用户上传的长文档
+    （病历 PDF、体检报告合集）时，会加一路 embedding 做混合排序。
+    现在上向量，是为了架构图好看而付一份几百 MB 的运行时依赖 ——
+    这与"离线可部署"这条非功能需求直接冲突。
   </div>
 
-  <h4>（3）为什么不用 Agent 框架</h4>
+  <h4>（3）为什么自己写 Agent 循环，而不是套框架</h4>
   <p>
-    问诊是<b>线性对话</b>，不需要多步规划与自主决策。引入 Agent 框架会带来两个风险：
-    一是模型可能自行决定"再问一轮"或"直接给结论"，行为不可预测；
-    二是每一轮工具调用都增加延迟与费用，而用户是在深夜着急地问"要不要去医院"。
-    我们选择把"决策"写成确定性代码（红旗规则、冲突判定、排程），
-    只在"组织语言"这一步交给模型 —— <em>慢的地方必须快，不确定的地方必须确定</em>。
+    前半句先承认必要：问诊确实需要"先查再说"。用户问"我今天吃药了吗"，
+    提示词里静态塞的用药列表可能已经过期；问"这个药和我妈吃的冲突吗"，
+    得先拿到她的在服药物才能比。这两类问题不查库就只能靠编。
   </p>
+  <p>
+    后半句是取舍：<b>不引 LangChain 这类框架</b>。我们需要的只是
+    "模型返回 tool_calls → 执行 → 结果以 role=tool 回填 → 再问一次"这一个循环，
+    落在 <code>lib/agent.ts</code> 里不到 200 行，读得完、改得动、没有版本风险。
+    框架能省的是这 200 行，换来的是抽象层、回调协议与升级成本 ——
+    对 5 个只读工具来说不划算。
+  </p>
+  <p>
+    自己写就得自己定规矩，我们定了四条，全部写死在代码里：
+  </p>
+  <ul>
+    <li><b>最多两轮</b>。常见问题一轮就够（查用药 / 查科普），两轮覆盖"查药发现冲突、
+        再查那个冲突药"。再多是烧 token 换不来质量。</li>
+    <li><b>决策轮不流式、temperature=0、maxTokens=200</b>。这一轮只产出工具名和参数，
+        没必要逐字显示；参数必须稳定，不能让模型"发挥"出一个不存在的药名。</li>
+    <li><b>失败即降级</b>。上游 4xx（模型不支持 function calling）或网络抖动，
+        直接退回普通问答并记日志 —— 工具的缺席不该让这一轮问诊失败。</li>
+    <li><b>只读</b>。5 个工具全是查询，没有任何写操作。模型再怎么说"我帮你加一条用药"，
+        它也调不到写接口。</li>
+  </ul>
 
   <h3>4.2 集成方式</h3>
   <table>
@@ -511,16 +554,26 @@
         文本模型对图片"装看不见"是条件反射，与其费力纠正，不如让看得见的模型上场；没配视觉 Key 时退回本地 OCR 读文字</td></tr>
     <tr><td>配置热生效</td><td>模型名、temperature、maxTokens、Prompt 模板、问诊规则都存 Setting 表，管理端保存后 10 秒内生效，
         每次对话前经 <code>getAiRuntime()</code> 注入系统提示词 —— 调 AI 不用改代码、不用重启</td></tr>
+    <tr><td>工具调用</td><td>5 个只读工具以 Function Calling 声明（今日用药 / 依从率 / 药物安全核对 / 科普检索 / 历史问诊），
+        JSON Schema 只写一份（<code>lib/tools.ts</code> 的 <code>CONSULT_TOOLS</code>），对话与 MCP 两边共用</td></tr>
+    <tr><td>检索注入</td><td>提问先用 BM25 检索科普库，命中的 3 条按「标题 + 分类 + 三条要点」注入系统提示词并编号；
+        回答里出现 <code>[1]</code> 时，末尾「参考资料」按同一张编号表补出处</td></tr>
     <tr><td>失败处理</td><td>先调模型，流读完且内容非空，才把提问和回答<b>一起</b>写库；Key 错、上游 500、网络断都不会攒出"只有提问没有回答"的记录</td></tr>
     <tr><td>降级</td><td>无 Key 时 <code>MEDAI_DEMO_AI=1</code> 走本地模拟流，协议与真实调用一致，全链路可演练；就诊摘要另有本地模板兜底，<b>绝不空手</b></td></tr>
   </table>
 
   <h3>4.3 提示词工程</h3>
   <p>
-    每次对话前拼四样东西：① 档案（年龄、体型、血型、过敏史、病史、习惯、主诉）
-    ② 在服药物 ③ 最近 3 条问诊摘要 ④ 星标优先的 8 条结论。
-    这四块各自有 token 上限，总量恒定，<b>不会随对话变长而失控</b>；
+    每次对话前拼五样东西：① 档案（年龄、体型、血型、过敏史、病史、习惯、主诉）
+    ② 在服药物 ③ 最近 3 条问诊摘要 ④ 星标优先的 8 条结论
+    ⑤ 本轮 BM25 命中的 0~3 条科普条目（带编号，没有命中就整段不出现）。
+    前四块各自有 token 上限，总量恒定，<b>不会随对话变长而失控</b>；
     超出上限时按"过敏史 &gt; 主诉 &gt; 在服药物 &gt; 摘要 &gt; 结论"的顺序裁剪，把最后的位置留给最重要的信息。
+  </p>
+  <p>
+    工具说明单独占一条 system 消息，与"正事"那段分开：决策轮带上它、正式作答的流式轮不带。
+    这样一来，正式回答的提示词和加工具之前<b>逐字一致</b> —— 工具只影响"查什么"，
+    不影响"怎么说"，回归问题时能一眼分清是工具的锅还是提示词的锅。
   </p>
   <p>
     <b>医疗合规三件套永远在场</b>：不下诊断、不开处方；过敏史优先考虑并主动提醒；
@@ -542,6 +595,14 @@
         <td>避免模型"顺着用户说"污染档案，同时把确认成本降到一次点击</td></tr>
     <tr><td>参数范围服务端夹紧</td><td>temperature / maxTokens 等数值配置在写入与读取两端都做范围校验（0–1.5 / 100–4000）</td>
         <td>管理端传错值不会污染对话链路；配置变更全部落审计日志，可追溯</td></tr>
+    <tr><td>意图门控，先筛后查</td><td>进 Agent 之前用一组正则判断"这句话要不要查库"（吃药 / 漏服 / 能不能吃 / 过敏 / 上次说的…）</td>
+        <td>纯聊天（"我最近压力大"）不付那次 2~4 秒的工具决策；9 条门控用例逐条验证，该查的都查、不该查的不查</td></tr>
+    <tr><td>工具往返有硬上限</td><td>最多两轮；决策轮温度 0、上限 200 token；不支持 function calling 的模型直接降级</td>
+        <td>最坏情况的延迟与费用可预估，不会出现"模型自己又查了三轮"</td></tr>
+    <tr><td>引用编号由表统一分配</td><td>预检索命中的条目先登记，工具后来检索到的接着往后排，回答末尾按同一张表输出</td>
+        <td>模型写 <code>[3]</code> 与用户看到的第 3 条<b>永远是同一份文档</b>，不会两条路径各编一套号</td></tr>
+    <tr><td>能算的别让模型算</td><td>异常项计数、化验小结、对比箭头全部由代码算；模型的自我归纳只作参考</td>
+        <td>实测模型把"白细胞"说成异常项（6.2 在 3.5–9.5 之内），代码算出的是红细胞；表格标 4 项、小结也说 4 项</td></tr>
     <tr><td>统计不编造</td><td>后台 AI 指标（分诊命中率、采纳率、摘要率）全部由真实数据聚合；无原始数据的口径（分科）用关键词推断并<b>在页面标注统计口径</b></td>
         <td>宁可显示"口径：按主诉关键词推断"，也不展示一个没有依据的漂亮数字</td></tr>
   </table>
@@ -583,6 +644,30 @@
     <li><b>隐私</b>：问诊记录页只展示<b>症状输入与 AI 分析摘要</b>，不提供对话原文入口 —— 管理员看得到"聊了什么主题"，看不到"原话怎么说的"。</li>
     <li><b>审计</b>：停用 / 重置密码 / 改配置 / 发公告 / 处理反馈，每一个后台写操作都落 <code>AdminLog</code>，操作人、对象、详情可追溯。</li>
   </ul>
+
+  <h3>4.6 MCP：把同一批工具交给外部客户端</h3>
+  <p>
+    对话里的 5 个工具，另外封装成一个 <b>stdio 的 MCP server</b>
+    （<code>scripts/mcp-server.ts</code>，约 170 行）。用
+    <code>MEDAI_MCP_USER=demo@medai.local npm run mcp</code> 启动后，
+    Claude Desktop / Cursor 这类客户端可以直接问"我妈今天吃药了吗"，
+    拿到的是同一份数据、同一套判定。
+  </p>
+  <table>
+    <tr><th style="width:22%">问题</th><th>我们的答案</th></tr>
+    <tr><td>为什么不另写一套</td><td>工具的 JSON Schema 只写一份：<code>CONSULT_TOOLS</code> 同时喂给模型和 MCP 客户端，
+        执行仍然走同一个 <code>runTool()</code>。两套实现迟早会漂移成"对话里能查、客户端里查不了"</td></tr>
+    <tr><td>身份从哪来</td><td>stdio 是本机进程，用环境变量指定账号（<code>MEDAI_MCP_USER</code>）；
+        工具参数里可带 <code>patient_name</code>，不带就用该账号最早的档案</td></tr>
+    <tr><td>越权怎么办</td><td>权限仍是 <code>ownerId + patientId</code> 两道，与 HTTP 接口同一套查询条件；
+        stdio 不存在跨用户访问，谈不上把接口暴露到公网</td></tr>
+    <tr><td>能改数据吗</td><td><b>不能</b>。这一层只导出查询工具，不提供任何写操作 —— 外部客户端接进来也改不了患者的档案、用药和结论</td></tr>
+  </table>
+  <div class="note">
+    <b>做这一层的意义不在"多接一个客户端"。</b>
+    它证明工具层是独立能力，不绑在自家聊天窗口上：工具的边界（只读、按人隔离、口径统一）
+    在两种调用方式下是同一份代码说了算，而不是各写一遍、各有一套判断。
+  </div>
 </section>
 
 <!-- ============ 05 ============ -->
@@ -593,7 +678,7 @@
   <table>
     <tr><th style="width:24%">一层</th><th>内容</th></tr>
     <tr><td>草地（首页）</td><td>家人档案栏 · 今日用药木牌 · 绒球医生 · 疾病科普 / 药品说明两个入口</td></tr>
-    <tr><td>档案详情</td><td>基本信息 · 在服药物 · 结论卡片 · 问诊记录（日历） · 病程时间轴 · 成长记录</td></tr>
+    <tr><td>档案详情</td><td>基本信息 · 在服药物 · 结论卡片 · 问诊记录（日历） · 化验单（含前后对比） · 病程时间轴 · 成长记录</td></tr>
     <tr><td>问诊面板</td><td>流式对话 · 附件（图片/PDF/Word） · 事实核对 · 就诊摘要</td></tr>
     <tr><td>科普库</td><td>疾病 90 条（13 科室）· 药品 73 种（10 大类）· 症状搜索</td></tr>
     <tr><td>「我的」页</td><td>账号信息 · 本机账号列表一键切换 · 意见反馈提交与历史</td></tr>
@@ -686,7 +771,49 @@
     这个闭环让"收集意见"不是摆设 —— 用户提交后 24 小时内能看到回音，是运营可信度的来源。
   </p>
 
-  <h3>5.4 开发过程</h3>
+  <h3>5.4 化验单：从一张照片到一张能对比的表</h3>
+  <p>
+    子女拿到父母的化验单，往往只能看懂"有个箭头朝上"，看不懂<b>比上个月是好了还是坏了</b>。
+    这一块就回答两个问题：哪几项超了、比上次往好还是往坏走。流程四步 ——
+    上传（复用附件通道）→ 视觉模型抽取 → 代码判异常并合成小结 → 落库并与上一份同类单据逐项对比。
+  </p>
+
+  <h4>（1）只让模型"抄"，不让它"算"</h4>
+  <p>
+    提示词里写死了边界：只输出项目名、结果、单位、参考区间四项，<b>不做诊断、不给建议</b>。
+    这样抽出来的是一张表，而不是一段没法比较的话；合规上也干净 ——
+    模型没有机会说出"提示轻度贫血、建议复查"这类越界判断。
+  </p>
+
+  <h4>（2）异常判定以算术为准，单据标记只作备选</h4>
+  <p>
+    第一版让模型自己标 <code>abnormal</code>，实测它会把箭头贴错行：白细胞 6.2 明明在 3.5–9.5
+    之内，被标成"偏低"；真正偏低的红细胞 4.05 反而漏了。于是改成
+    <b>能算的一律用算术</b>：取结果里的数字、解析参考区间的上下界，超出哪个边界就是哪个方向。
+    只有定性项目（阴性 / 阳性）或单据没印区间时，才采信模型读到的标记。
+  </p>
+  <p>
+    小结同理：模型写的那句也数错了（说 3 项异常、把白细胞算进去、漏掉红细胞），
+    所以小结改为代码合成 ——"共 8 项，其中 4 项超出参考区间：红细胞计数偏低、血红蛋白偏低、
+    C 反应蛋白偏高、空腹血糖偏高"。表格标 4 项、小结也说 4 项，两处永远一致。
+  </p>
+
+  <h4>（3）对比不存库，每次现算</h4>
+  <p>
+    "较上次"是读的时候算的，不落库。原因很实际：患者补传一张更早的单子，
+    后面几张的对比对象就全变了；存下来只会得到两张卡片各自声称"上次是 5 月"的矛盾。
+    判断顺序也有讲究 —— <b>先看异常状态是否翻转，再看数值方向</b>：
+    血糖从 7.8 降到 6.9（仍偏高）是"在好转"，只看箭头会得出相反结论；
+    两项都异常时，则比较"离参考区间有多远"，距离缩短记为好转。
+  </p>
+  <div class="note">
+    <b>实测一份血常规：</b>抽出 8 项、判定 4 项异常；与上一次比，血红蛋白 126 → 118（−6.3%，变差）、
+    C 反应蛋白 5.2 → 12.4（+138.5%，变差）、空腹血糖 6.2 → 6.8（+9.7%，变差）、
+    白细胞 6.0 → 6.2（+3.3%，无实质变化）。读不出指标时直接返回 422 并说明换一张更清晰的图，
+    不留半份脏数据。
+  </div>
+
+  <h3>5.5 开发过程</h3>
   <p>
     项目按"能用 → 好用 → 敢交"三段推进，每一轮都以"自检脚本全绿 + 真实截图"收尾。
     代码按模块分 18 次提交入库，提交信息记录每次改了什么、为什么改。
@@ -699,9 +826,10 @@
     <tr><td>第 4 周</td><td>用药提醒、木牌、病程时间轴、疾病/药品科普库</td><td>覆盖"吃、看、说"三个真实动作</td></tr>
     <tr><td>第 5 周</td><td>木牌上直接打卡、404/错误页、演示入口、打包与离线部署</td><td>从"能演示"走到"能交付"</td></tr>
     <tr><td>第 6 周</td><td>看图问诊（双模型路由）、管理员后台四组控制台、用户反馈闭环、「我的」页、平台名称全站生效</td><td>补上"平台运营者"这个角色，产品从单机工具变成可运营的平台</td></tr>
+    <tr><td>第 7 周</td><td>BM25 检索与引用脚注、5 个只读工具 + Agent 循环（含意图门控）、MCP 导出、化验单结构化与前后对比</td><td>把"只会聊"补成"能查、能算、能取证"，AI 部分从提示词工程升级成有工具与检索的应用</td></tr>
   </table>
 
-  <h3>5.5 四个修得比较深的问题</h3>
+  <h3>5.6 四个修得比较深的问题</h3>
   <h4>（1）低帧率设备上，转场会错位</h4>
   <p>
     最初转场进度是把每帧 <code>dt</code> 累加。但引擎里 <code>dt</code> 被钳到 0.05，
@@ -739,7 +867,7 @@
 
   <h3>6.1 技术创新点</h3>
   <p>
-    五条，共同点是<b>把"该确定的"从模型手里拿回来</b>，只在模型擅长的地方用它。
+    七条，共同点是<b>把"该确定的"从模型手里拿回来</b>，只在模型擅长的地方用它。
   </p>
   <table>
     <tr><th style="width:24%">创新点</th><th style="width:34%">通行做法</th><th>我们的做法</th></tr>
@@ -771,11 +899,23 @@
       <td>纯文字轮次走 GLM-4-Flash，带图轮次才切 GLM-4V-Flash 读原图；切换封装在 AI 层内部，
           业务代码无感；没配视觉 Key 时图片退回本地 OCR。成本只花在真正需要"看"的那几轮</td>
     </tr>
+    <tr>
+      <td><b>T6　工具调用前面加一道"值不值得查"</b></td>
+      <td>每句话都先走一轮工具决策，纯聊天也要多等 2~4 秒</td>
+      <td>先用一组正则做意图门控（吃药 / 漏服 / 能不能吃 / 过敏 / 上次说的），命中了才进 Agent；
+          进了之后调哪个工具仍由模型自己定。9 条用例逐条验证：该查的查、该直答的直答</td>
+    </tr>
+    <tr>
+      <td><b>T7　同一批工具两种用法</b></td>
+      <td>工具写在聊天路由里，只有自家页面能用；或者为外部客户端另写一套</td>
+      <td>工具的 JSON Schema 只写一份，对话里用 Function Calling、外部用 MCP stdio 导出，
+          执行共用 <code>runTool()</code>。两种入口的只读边界与按人隔离由同一份代码保证</td>
+    </tr>
   </table>
 
   <h3>6.2 应用创新点</h3>
   <p>
-    四条，共同点是<b>把一个动作的完成成本压到最低</b>，而不是增加功能数量。
+    五条，共同点是<b>把一个动作的完成成本压到最低</b>，而不是增加功能数量。
   </p>
   <table>
     <tr><th style="width:24%">创新点</th><th style="width:34%">通行做法</th><th>我们的做法</th></tr>
@@ -801,6 +941,12 @@
       <td>管理后台要么没有（出了问题没抓手），要么能看全部对话（隐私形同虚设）</td>
       <td>管理员可停用账号、重置密码、发公告、看统计与 AI 摘要，但<b>接口层就没有对话原文的入口</b>；
           用户反馈带回复闭环，意见有去有回；每个后台动作落审计日志</td>
+    </tr>
+    <tr>
+      <td><b>A5　化验单不看箭头，看"比上次"</b></td>
+      <td>把化验单当图片存着，或者只做 OCR 转成一段文字</td>
+      <td>抽出指标后与上一份同类单据逐项对比：哪几项新超标、哪几项在好转、变化多少。
+          对比每次现算，补传一张更早的单子不会让旧卡片说错话</td>
     </tr>
   </table>
 
@@ -834,6 +980,10 @@
     <tr><td><code>scripts/check-login.mjs</code></td><td class="c">18</td><td>登录只有邮箱一条路、Cookie、越权拒绝</td></tr>
     <tr><td><code>scripts/check-entry.mjs</code></td><td class="c">8</td><td>中文 404、错误页出口、演示入口一步进入</td></tr>
     <tr><td><code>scripts/knowledge-test.ts</code></td><td class="c">—</td><td>90 条疾病 + 73 种药品的字段完整性与搜索命中（同义词归一）</td></tr>
+    <tr><td>意图门控用例</td><td class="c">9</td><td>该查库的（吃药 / 漏服 / 能不能吃 / 过敏 / 上次说的）判为查，纯聊天判为直答</td></tr>
+    <tr><td>工具实机调用</td><td class="c">5</td><td>5 个工具各跑一次真实数据，核对返回字段与冲突标记</td></tr>
+    <tr><td>MCP 握手与调用</td><td class="c">4</td><td>initialize / tools.list / 3 次 tools.call，按 MCP 标准客户端验证</td></tr>
+    <tr><td>化验单抽取</td><td class="c">—</td><td>一张血常规样张：8 项抽取、4 项异常判定、与上一份逐项对比（含数值/百分比/方向）</td></tr>
     <tr><td><code>tsc --noEmit</code> / <code>eslint .</code></td><td class="c">0 错误</td><td>类型与规范</td></tr>
   </table>
   <p class="small">
@@ -849,6 +999,8 @@
         不做"先查再比对"，避免从响应差异确认某个 id 是否存在。</li>
     <li>上传只校验文件头魔数（PNG / JPEG / GIF / WebP），文件名由服务器 <code>randomUUID</code> 生成，不采信用户文件名。</li>
     <li>登录限流：按 IP 8 次 / 按账号 5 次，每 15 分钟；<b>成功登录会把计数清零</b>，正常用户不会被误锁。</li>
+    <li><b>AI 只能读</b>：5 个工具与 MCP 导出的全部是查询，参数里的 <code>patientId</code> 一律按 <code>ownerId</code> 重查，
+        模型无法通过工具改档案、加药或写结论 —— 写作一律走患者的显式操作。</li>
     <li>管理接口统一 <code>requireAdmin()</code> 守卫；注册接口强制 user 角色，无提权入口；
         停用账号的旧 Cookie 立即失效；管理员账号不可被停用或重置；后台写操作全部落审计日志。</li>
     <li>管理员可见范围收敛：问诊记录只有症状输入与 AI 分析摘要，<b>接口层不存在对话原文的读取入口</b>；
@@ -891,15 +1043,18 @@
 
   <h3>8.1 做成了什么</h3>
   <p>
-    六周时间，做了四件事：<b>一个能管全家的档案容器</b>、<b>一个有边界的 AI 问诊</b>、
-    <b>一个愿意被打开的外壳</b>，以及<b>一条能运营、能听到回音的通路</b>（管理后台与反馈闭环）。
+    七周时间，做了五件事：<b>一个能管全家的档案容器</b>、<b>一个有边界的 AI 问诊</b>、
+    <b>一个愿意被打开的外壳</b>、<b>一条能运营、能听到回音的通路</b>（管理后台与反馈闭环），
+    以及<b>一套能查、能算、能取证的 AI 能力</b>（工具调用、检索与出处、化验单前后对比）。
     前两件是功能，第三件是这类产品能不能被用起来的前提 ——
     一个需要教三遍才会用的健康 App，老人第二天就不会再点开。
   </p>
   <p>
     技术上最值得记的不是用了什么框架，而是几条约束：
-    安全判断不交给模型、冲突判定不交给模型、结论生成不交给模型。
-    这三条让产品的行为可预测、可解释、可审计，代价是少了几个"看起来很 AI"的功能。
+    安全判断不交给模型、冲突判定不交给模型、结论生成不交给模型，
+    异常项计数与化验小结也不交给模型 —— 能算的都自己算。
+    这些约束让产品的行为可预测、可解释、可审计，代价是少了几个"看起来很 AI"的功能；
+    但换来了另一种东西：当模型说"3 项异常"而表格标了 4 项时，我们不需要争论，代码说了算。
   </p>
 
   <h3>8.2 局限</h3>
@@ -908,6 +1063,10 @@
     <li><b>红旗规则覆盖有限</b>：11 条规则能拦住最典型的急症表述，但方言、口语化表达仍可能漏判。</li>
     <li><b>单机架构</b>：家庭自用足够，机构规模需要换 Postgres 与对象存储。</li>
     <li><b>AI 回答质量依赖上游模型</b>：提示词能约束边界，但不能保证每句话都准确。</li>
+    <li><b>检索是词面匹配</b>：BM25 对"我最近老是半夜醒"这类没有关键词的提问命中率低，
+        此时不硬凑（返回空并让模型说明科普库未覆盖），但也不等于检索到了相关内容。</li>
+    <li><b>化验单依赖照片质量</b>：拍歪、反光、被裁切的单据会漏项；我们的策略是看不清楚的不猜，
+        宁可少一项，也不给一个编出来的数值。</li>
   </ul>
 
   <h3>8.3 推广路径</h3>
@@ -971,7 +1130,7 @@
     <tr><td>环境变量</td><td>见仓库根目录 <code>.env.example</code>，含数据库、会话密钥、模型、保留天数全部配置项</td></tr>
   </table>
   <p class="small" style="margin-top:10pt">
-    源码规模：约 2.9 万行（TypeScript / TSX / JS，不含依赖与构建产物）；31 个 API 路由；90 + 73 条科普内容。
+    源码规模：约 3.1 万行（TypeScript / TSX / JS，不含依赖与构建产物）；33 个 API 路由；90 + 73 条科普内容。
   </p>
 </section>
 

@@ -394,7 +394,12 @@ body.is-consulting .consult.is-closed {
   to { opacity: 1; transform: none; }
 }
 
-.msg--typing { display: inline-flex; gap: 5px; padding: 15px; }
+.msg--typing { display: inline-flex; gap: 5px; padding: 15px; align-items: center; }
+/* 等回答的时候告诉用户在查什么，比三个点干等强 */
+.msg__typing-label {
+  margin-left: 7px; font: 600 11.5px/1 var(--font-ui);
+  color: rgba(74, 45, 27, 0.55); letter-spacing: 0.02em;
+}
 .msg--typing i {
   width: 6px; height: 6px; border-radius: 50%; background: rgba(38, 41, 35, 0.34);
   animation: dot 1.1s ease-in-out infinite;
@@ -404,6 +409,28 @@ body.is-consulting .consult.is-closed {
 @keyframes dot {
   0%, 70%, 100% { transform: translateY(0); opacity: 0.45; }
   35% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ---- 工具调用记录：这一轮模型查了什么，说清楚比藏着好 ---- */
+.msg__tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 9px; }
+.msg__tool {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 8px 3px 6px; border-radius: 8px;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: inset 0 0 0 1px rgba(160, 96, 58, 0.16);
+  font: 600 10.5px/1.5 var(--font-ui); color: #96522d; letter-spacing: 0.01em;
+}
+.msg__tool em { font-style: normal; font-weight: 500; opacity: 0.6; }
+.msg__tool-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: currentColor; opacity: 0.55;
+}
+.msg__tool[data-status="running"] .msg__tool-dot {
+  opacity: 1; animation: toolPulse 1s ease-in-out infinite;
+}
+@keyframes toolPulse {
+  0%, 100% { transform: scale(0.7); opacity: 0.45; }
+  50% { transform: scale(1.15); opacity: 1; }
 }
 
 /* ---- 气泡里的「修改」：防手滑打错字，改完原地重答 ---- */
@@ -4505,4 +4532,109 @@ body.is-over-sign .world__canvas { cursor: pointer; }
   .me__row { grid-template-columns: minmax(0, 1fr); }
   .me__nav { padding: 18px 4px 8px; }
   .sheetwrap__me { margin-left: auto; padding: 7px 11px; }
+}
+
+/* ============================================================
+   化验单：拍一张 → 抽成表 → 和上一次比
+   只回答两件事：哪几项超了、比上次往好还是往坏走
+   ============================================================ */
+
+.lab { display: grid; gap: 14px; }
+
+.lab__bar {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+.lab__title { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0 0 3px; }
+.lab__hint { font-size: 12px; line-height: 1.6; color: var(--ink-muted); margin: 0; max-width: 46ch; }
+.lab__pick { cursor: pointer; flex: none; }
+.lab__pick.is-busy { opacity: 0.7; cursor: progress; }
+
+.lab__error {
+  font-size: 12px; color: #a3352a; background: rgba(180, 82, 42, 0.08);
+  border-radius: 11px; padding: 9px 12px; margin: 0;
+}
+.lab__empty {
+  font-size: 12.5px; line-height: 1.7; color: var(--ink-muted);
+  padding: 22px 16px; text-align: center;
+  background: rgba(255, 253, 246, 0.55); border-radius: 16px;
+  box-shadow: inset 0 0 0 1px rgba(150, 128, 96, 0.12);
+}
+
+.lab__list { display: grid; gap: 10px; }
+
+.lab__card {
+  border-radius: 16px; background: rgba(255, 253, 246, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(150, 128, 96, 0.14);
+  overflow: hidden;
+}
+.lab__card.is-open { background: rgba(255, 253, 246, 0.92); }
+
+.lab__head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 10px; padding: 13px 15px; cursor: pointer;
+}
+.lab__head:hover { background: rgba(240, 235, 220, 0.4); }
+.lab__date {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px;
+  font-size: 13.5px; font-weight: 700; color: var(--ink); margin: 0 0 4px;
+}
+.lab__kind {
+  font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 99px;
+  background: rgba(111, 138, 82, 0.14); color: #4f6839;
+}
+.lab__hosp { font-size: 11.5px; font-weight: 500; color: var(--ink-muted); }
+.lab__meta {
+  display: flex; flex-wrap: wrap; gap: 4px 12px;
+  font-size: 11.5px; color: var(--ink-muted); margin: 0;
+}
+.lab__bad { color: #a3352a; font-weight: 600; }
+.lab__good { color: #4f6839; font-weight: 600; }
+.lab__delta { font-weight: 600; }
+.lab__delta.is-bad { color: #a3352a; }
+.lab__delta.is-good { color: #4f6839; }
+
+.lab__del {
+  flex: none; font: inherit; font-size: 11px; color: var(--ink-muted);
+  background: none; border: 0; padding: 3px 2px; cursor: pointer;
+  border-bottom: 1px solid transparent;
+}
+.lab__del:hover { color: #a3352a; border-bottom-color: rgba(163, 53, 42, 0.4); }
+
+.lab__summary {
+  font-size: 12px; line-height: 1.7; color: var(--ink-soft);
+  margin: 0; padding: 0 15px 12px;
+}
+
+.lab__tablewrap { overflow-x: auto; border-top: 1px solid rgba(150, 128, 96, 0.14); }
+.lab__table {
+  width: 100%; border-collapse: collapse; font-size: 12px; min-width: 520px;
+}
+.lab__table th {
+  text-align: left; font-weight: 600; font-size: 11px; letter-spacing: 0.04em;
+  color: var(--ink-muted); padding: 9px 12px; white-space: nowrap;
+  background: rgba(240, 235, 220, 0.35);
+}
+.lab__table td {
+  padding: 8px 12px; border-top: 1px solid rgba(150, 128, 96, 0.1);
+  color: var(--ink-soft); vertical-align: baseline;
+}
+.lab__table tr.is-high td { background: rgba(180, 82, 42, 0.05); }
+.lab__table tr.is-low td { background: rgba(74, 107, 138, 0.05); }
+.lab__val { white-space: nowrap; font-weight: 600; color: var(--ink); }
+.lab__val em { font-style: normal; font-weight: 400; font-size: 10.5px; color: var(--ink-muted); margin-left: 3px; }
+.lab__mark { font-style: normal; margin-left: 3px; font-size: 11px; }
+.lab__table tr.is-high .lab__mark { color: #a3352a; }
+.lab__table tr.is-low .lab__mark { color: #4a6b8a; }
+.lab__ref { color: var(--ink-muted); white-space: nowrap; }
+
+.lab__cmp { white-space: nowrap; font-size: 11.5px; color: var(--ink-muted); }
+.lab__cmp em { font-style: normal; font-size: 10.5px; opacity: 0.8; margin-left: 6px; }
+.lab__cmp span { display: block; font-size: 10.5px; margin-top: 2px; }
+.lab__cmp.is-bad { color: #a3352a; font-weight: 600; }
+.lab__cmp.is-good { color: #4f6839; font-weight: 600; }
+
+@media (max-width: 720px) {
+  .lab__bar { flex-direction: column; align-items: stretch; }
+  .lab__pick { align-self: flex-start; }
 }

@@ -7,6 +7,7 @@ import VisitSheetPanel from "./VisitSheet";
 import VisitCalendar from "./VisitCalendar";
 import VisitTranscript from "./VisitTranscript";
 import PatientTimeline from "./PatientTimeline";
+import LabReports from "./LabReports";
 import { buildTimeline } from "@/lib/timeline";
 import { scheduleLabel } from "@/lib/medication-schedule";
 import {
@@ -40,12 +41,13 @@ import {
   type MedicationReminder,
 } from "@/lib/client/api";
 
-type Tab = "meds" | "notes" | "visits" | "timeline" | "growth";
+type Tab = "meds" | "notes" | "visits" | "lab" | "timeline" | "growth";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "meds", label: "用药" },
   { key: "notes", label: "结论" },
   { key: "visits", label: "问诊记录" },
+  { key: "lab", label: "化验单" },
   { key: "timeline", label: "时间轴" },
   { key: "growth", label: "成长" },
 ];
@@ -478,17 +480,20 @@ export default function PatientDetail({
             onClick={() => setTab(t.key)}
           >
             {t.label}
-            <i>
-              {t.key === "meds"
-                ? active.length
-                : t.key === "notes"
-                  ? notes.length
-                  : t.key === "visits"
-                    ? visits.length
-                    : t.key === "timeline"
-                      ? timelineTotal
-                      : growth.streak}
-            </i>
+            {/* 化验单的张数要单独拉一次，没必要为了角标把详情页变成双请求 */}
+            {t.key === "lab" ? null : (
+              <i>
+                {t.key === "meds"
+                  ? active.length
+                  : t.key === "notes"
+                    ? notes.length
+                    : t.key === "visits"
+                      ? visits.length
+                      : t.key === "timeline"
+                        ? timelineTotal
+                        : growth.streak}
+              </i>
+            )}
           </button>
         ))}
       </nav>
@@ -915,6 +920,13 @@ export default function PatientDetail({
             }}
             onDelete={(v) => void removeVisit(v)}
           />
+        </section>
+      )}
+
+      {/* ------------------------------------------------------------ 化验单 */}
+      {tab === "lab" && (
+        <section className="panel">
+          <LabReports patientId={patient.id} />
         </section>
       )}
 

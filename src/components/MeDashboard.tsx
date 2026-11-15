@@ -79,8 +79,11 @@ export default function MeDashboard({
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  // localStorage 只能在浏览器端读，所以放 effect 里；同时把当前账号补进去
+  // localStorage 只能在浏览器端读，所以放 effect 里；同时把当前账号补进去。
+  // 这里必须 setState：服务端渲染时读不到 localStorage，初值只能是空数组，
+  // 挂载后再补齐，否则水合结果会和客户端不一致。
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAccounts(rememberAccount(email));
   }, [email]);
 

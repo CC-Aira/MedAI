@@ -152,16 +152,18 @@ async function call<T>(url: string, method: string, body?: unknown): Promise<T> 
 
 /* ---------------------------------------------------------------- 图表 */
 
+/** 图表的画布尺寸与内边距：提到组件外，引用稳定，放 useMemo 依赖里也不会反复重建 */
+const CHART_W = 760;
+const CHART_H = 190;
+const PAD = { top: 16, right: 12, bottom: 24, left: 12 } as const;
+
 function TrendChart({ data }: { data: TrendPoint[] }) {
   const [hover, setHover] = useState<number | null>(null);
-  const W = 760;
-  const H = 190;
-  const PAD = { top: 16, right: 12, bottom: 24, left: 12 };
 
   const { line, area, points, maxV } = useMemo(() => {
     const max = Math.max(1, ...data.map((d) => d.consultations));
-    const innerW = W - PAD.left - PAD.right;
-    const innerH = H - PAD.top - PAD.bottom;
+    const innerW = CHART_W - PAD.left - PAD.right;
+    const innerH = CHART_H - PAD.top - PAD.bottom;
     const step = data.length > 1 ? innerW / (data.length - 1) : innerW;
     const pts = data.map((d, i) => ({
       x: PAD.left + i * step,
@@ -181,7 +183,7 @@ function TrendChart({ data }: { data: TrendPoint[] }) {
   return (
     <div className="adm__chart">
       <svg
-        viewBox={`0 0 ${W} ${H}`}
+        viewBox={`0 0 ${CHART_W} ${CHART_H}`}
         role="img"
         aria-label="近 30 天每日问诊次数"
         onMouseLeave={() => setHover(null)}
@@ -193,12 +195,12 @@ function TrendChart({ data }: { data: TrendPoint[] }) {
           </linearGradient>
         </defs>
         {[0, 0.5, 1].map((r) => {
-          const y = PAD.top + (H - PAD.top - PAD.bottom) * r;
+          const y = PAD.top + (CHART_H - PAD.top - PAD.bottom) * r;
           return (
             <line
               key={r}
               x1={PAD.left}
-              x2={W - PAD.right}
+              x2={CHART_W - PAD.right}
               y1={y}
               y2={y}
               stroke="rgba(38,41,35,0.08)"
@@ -221,7 +223,7 @@ function TrendChart({ data }: { data: TrendPoint[] }) {
               x={p.x - 8}
               y={PAD.top}
               width={16}
-              height={H - PAD.top - PAD.bottom}
+              height={CHART_H - PAD.top - PAD.bottom}
               fill="transparent"
               onMouseEnter={() => setHover(i)}
             />
@@ -231,12 +233,12 @@ function TrendChart({ data }: { data: TrendPoint[] }) {
           </g>
         ))}
         {active && (
-          <line x1={active.x} x2={active.x} y1={PAD.top} y2={H - PAD.bottom} stroke="rgba(180,82,42,0.35)" />
+          <line x1={active.x} x2={active.x} y1={PAD.top} y2={CHART_H - PAD.bottom} stroke="rgba(180,82,42,0.35)" />
         )}
-        <text x={PAD.left} y={H - 6} className="adm__axis">
+        <text x={PAD.left} y={CHART_H - 6} className="adm__axis">
           {data[0]?.date.slice(5)}
         </text>
-        <text x={W - PAD.right} y={H - 6} textAnchor="end" className="adm__axis">
+        <text x={CHART_W - PAD.right} y={CHART_H - 6} textAnchor="end" className="adm__axis">
           {data[data.length - 1]?.date.slice(5)}
         </text>
       </svg>
@@ -697,7 +699,7 @@ export default function AdminDashboard({
                     <div>
                       <dt>分诊归类率</dt>
                       <dd>
-                        平台没有独立的分诊模型，这里统计"能被关键词规则归到某科室"的会话占比，反映问题分布的可解释程度，不等于分诊准确率。
+                        平台没有独立的分诊模型，这里统计「能被关键词规则归到某科室」的会话占比，反映问题分布的可解释程度，不等于分诊准确率。
                       </dd>
                     </div>
                     <div>
@@ -709,7 +711,7 @@ export default function AdminDashboard({
                     <div>
                       <dt>小结 / 结论沉淀率</dt>
                       <dd>
-                        这两个是"用户觉得这次对话值得留下来"的可观测代理，比任何自评分都更能说明 AI 是否真的有用。
+                        这两个是「用户觉得这次对话值得留下来」的可观测代理，比任何自评分都更能说明 AI 是否真的有用。
                       </dd>
                     </div>
                     <div>

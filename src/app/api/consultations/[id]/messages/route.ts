@@ -14,9 +14,15 @@ import {
   askVision,
   assertAiReady,
   readDeepSeekStream,
-  type ChatMessage,
   type VisionMessage,
 } from "@/lib/ai";
+import { planWithTools, CitationIndex, needsLiveData } from "@/lib/agent";
+import {
+  citationFooter,
+  formatRagBlock,
+  retrieveKnowledge,
+  usedRefs,
+} from "@/lib/rag";
 import { buildChatContext, saveRedFlagTurn } from "@/lib/consult-flow";
 import { requireOwnedConsultation } from "@/lib/consultations";
 import { detectRedFlags } from "@/lib/red-flags";
@@ -194,7 +200,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     }
 
     // 5. 认门 + 装配上下文（顺带 404）
-    const { system, messages } = await buildChatContext(user.id, id, content, {
+    const { system, messages, patient, attachments } = await buildChatContext(user.id, id, content, {
       attachmentId: attachmentId ?? undefined,
       // 编辑时不要把它自己的旧版本再塞回历史，否则模型会以为"同一句话说了两遍"
       excludeMessageId: editingId ?? undefined,
@@ -206,7 +212,19 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     const extra = [runtime.consultRules, runtime.promptExtra]
       .filter((t) => t && t.trim())
       .join("\n\n");
-    const systemWithExtra = extra ? `${system}\n\n【平台补充规则】\n${extra}` : system;
+    let systemWithExtra = extra ? `${system}\n\n【平台补充规则】\n${extra}` : system;
+
+    // 5.5 检索增强：先用这句话（含附件里读出的文字）去科普库捞最相关的几条。
+    //     编号 1..k 就是这一刻确定的，后面工具再查到的接着往后排 ——
+    //     模型在回答里标的 [2]，和用户看到的第 2 条永远是同一份文档。
+    const retrievalQuery = [content, ...attachments.map((a) => a.text)]
+      .join("\n")
+      .slice(0, 600);
+    const prefetch = retrieveKnowledge(retrievalQuery, { topK: 3 });
+    const registry = new CitationIndex(prefetch.map((h) => h.doc));
+    if (registry.size > 0) {
+      systemWithExtra = `${systemWithExtra}\n\n${formatRagBlock(registry.all)}`;
+    }
 
     // 6. 查配置：没配 Key 且没开演示模式就是 503，别去连上游
     assertAiReady();
@@ -239,23 +257,6 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       }
     }
 
-    const payload: ChatMessage[] = [
-      { role: "system", content: systemWithExtra },
-      ...messages,
-    ];
-    const upstream = visionRequest
-      ? await askVision({
-          messages: visionRequest,
-          temperature: runtime.temperature,
-          maxTokens: runtime.maxTokens,
-        })
-      : await askDeepSeek({
-          messages: payload,
-          temperature: runtime.temperature,
-          maxTokens: runtime.maxTokens,
-          model: runtime.model,
-        });
-
     const encoder = new TextEncoder();
     let full = "";
 
@@ -266,10 +267,54 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         };
 
         try {
+          // 带图的那一轮不走工具：视觉模型 + function calling 的组合在中文模型上
+          // 还不稳定，而且图片本身的上下文已经够了。
+          let conversation: unknown[] = [
+            { role: "system", content: systemWithExtra },
+            ...messages,
+          ];
+
+          if (!visionRequest && needsLiveData(retrievalQuery || content)) {
+            push({ type: "status", text: "正在结合档案梳理" });
+            const plan = await planWithTools({
+              system: systemWithExtra,
+              messages,
+              context: { ownerId: user.id, patientId: patient.id },
+              registry,
+              model: runtime.model,
+              onTool: (event) => push({ type: "tool", ...event }),
+            });
+            conversation = [{ role: "system", content: systemWithExtra }, ...plan.messages];
+          }
+
+          const upstream = visionRequest
+            ? await askVision({
+                messages: visionRequest,
+                temperature: runtime.temperature,
+                maxTokens: runtime.maxTokens,
+              })
+            : await askDeepSeek({
+                messages: conversation,
+                temperature: runtime.temperature,
+                maxTokens: runtime.maxTokens,
+                model: runtime.model,
+              });
+
           await readDeepSeekStream(upstream, (delta) => {
             full += delta;
             push({ type: "delta", text: delta });
           });
+
+          // 出处脚注：模型自己标了 [1]，这里补一份能核对的名单。
+          // 只列回答里真的用到的条目 —— 检索到不等于用了，把没用的也列上是虚报。
+          if (!full.includes("参考资料")) {
+            const refs = usedRefs(registry.all, full);
+            if (refs.length > 0) {
+              const footer = citationFooter(refs);
+              full += footer;
+              push({ type: "delta", text: footer });
+            }
+          }
 
           const answer = full.trim();
           if (!answer) throw new HttpError(502, "AI 没有返回内容");

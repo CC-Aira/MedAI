@@ -5,6 +5,7 @@ const config = [
   {
     ignores: [
       ".next/**",
+      ".next-*/**",
       "node_modules/**",
       "public/**",
       "prisma/dev.db",

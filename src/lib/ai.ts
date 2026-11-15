@@ -10,7 +10,8 @@ export type VisionContentPart =
 export type VisionMessage = { role: ChatRole; content: string | VisionContentPart[] };
 
 export type AskOptions = {
-  messages: ChatMessage[];
+  /** 纯文本消息，或带 tool_calls / tool 回执的 Agent 消息，原样透传给上游 */
+  messages: unknown[];
   temperature?: number;
   maxTokens?: number;
   /** 覆盖模型名（后台「AI 模型配置」里填了就用它，留空走 .env） */
@@ -69,6 +70,13 @@ export function visionConfigured(): boolean {
 
 /** 视觉模型单次调用的整体超时：图片 + 多模态，比纯文本慢一些 */
 const VISION_TIMEOUT_MS = 30_000;
+
+/**
+ * 视觉模型的 max_tokens 上限。
+ * glm-4v-flash 只接受 [1,1024]，填 1800 会被上游 400 掉。
+ * 放在这里而不是散在各个调用点：换个视觉模型时只改这一个数。
+ */
+const VISION_MAX_TOKENS = 1024;
 
 /**
  * 让视觉模型客观描述一张图片，把结果交给文本模型当"眼睛"。
@@ -234,7 +242,7 @@ export async function askDeepSeek(options: AskOptions): Promise<Response> {
     if (!aiDemoMode()) {
       throw new HttpError(503, "AI 服务未配置，请先设置 DEEPSEEK_API_KEY");
     }
-    return demoStream(messages, json);
+    return demoStream(messages as ChatMessage[], json);
   }
 
   const payload: Record<string, unknown> = {
@@ -267,7 +275,7 @@ export async function askDeepSeekOnce(options: AskOptions): Promise<string> {
     if (!aiDemoMode()) {
       throw new HttpError(503, "AI 服务未配置，请先设置 DEEPSEEK_API_KEY");
     }
-    return demoOnce(messages, json);
+    return demoOnce(messages as ChatMessage[], json);
   }
 
   const payload: Record<string, unknown> = {
@@ -316,13 +324,143 @@ export async function askVision(options: {
     messages,
     stream: true,
     temperature,
-    max_tokens: maxTokens,
+    max_tokens: Math.min(maxTokens, VISION_MAX_TOKENS),
   };
   return postChatTo(
     `${visionBaseUrl()}/chat/completions`,
     visionApiKey(),
     payload,
   );
+}
+
+/**
+ * 视觉模型的一次性调用：只要结论，不要流。
+ *
+ * 化验单抽取属于"看一眼、吐一份结构化结果"的活，逐字显示没有意义 ——
+ * 用户要的是下面那张对比表，不是模型一边想一边打字。
+ * 温度压到 0.1：同一张单子抽两次应该得到同一份指标，别让它自由发挥。
+ */
+export async function askVisionOnce(options: {
+  messages: VisionMessage[];
+  temperature?: number;
+  maxTokens?: number;
+}): Promise<string> {
+  const { messages, temperature = 0.1, maxTokens = 900 } = options;
+
+  if (!visionConfigured()) {
+    throw new HttpError(503, "视觉模型未配置（VISION_API_KEY），无法识别化验单");
+  }
+
+  const payload: Record<string, unknown> = {
+    model: visionModel(),
+    messages,
+    stream: false,
+    temperature,
+    // glm-4v-flash 的 max_tokens 只接受 [1,1024]，超了直接 400。
+    // 视觉模型的输出本来就短（一段描述或一份 JSON），夹紧不会伤到谁。
+    max_tokens: Math.min(maxTokens, VISION_MAX_TOKENS),
+  };
+  const res = await postChatTo(
+    `${visionBaseUrl()}/chat/completions`,
+    visionApiKey(),
+    payload,
+  );
+
+  const data = (await res.json()) as {
+    choices?: { message?: { content?: string } }[];
+  };
+  const content = data.choices?.[0]?.message?.content;
+  if (typeof content !== "string" || !content.trim()) {
+    throw new HttpError(502, "视觉模型返回了空内容");
+  }
+  return content;
+}
+
+/* ------------------------------------------------------- 工具调用 */
+
+export type AssistantToolCall = {
+  id: string;
+  type: "function";
+  function: { name: string; arguments: string };
+};
+
+/** 带工具的一轮消息：助手可以只回 tool_calls，工具结果以 role=tool 回填 */
+export type AgentMessage =
+  | {
+      role: "system" | "user" | "assistant";
+      content: string | null;
+      tool_calls?: AssistantToolCall[];
+    }
+  | { role: "tool"; content: string; tool_call_id: string };
+
+/**
+ * 让模型决定「这一轮要不要查东西」。
+ *
+ * 刻意不开流式：这一轮只产出工具名和参数，通常几十个 token，等它的收益是
+ * 能提前知道要查什么、并把「正在查用药」这种状态推给前端。
+ * 真正的回答仍然走流式（askDeepSeek），用户看到的是一个字一个字出来的。
+ *
+ * 模型不支持 function calling 时上游会返回 4xx，这里原样抛出，由调用方降级成
+ * 普通问答 —— 换模型不该把问诊搞挂。
+ */
+export async function askWithTools(options: {
+  messages: AgentMessage[];
+  tools: unknown[];
+  temperature?: number;
+  maxTokens?: number;
+  model?: string | null;
+  signal?: AbortSignal;
+}): Promise<{ content: string; toolCalls: AssistantToolCall[] }> {
+  const { messages, tools, temperature = 0.2, maxTokens = 400, signal, model: modelOverride } = options;
+
+  if (!aiConfigured()) {
+    if (!aiDemoMode()) {
+      throw new HttpError(503, "AI 服务未配置，请先设置 DEEPSEEK_API_KEY");
+    }
+    return { content: "", toolCalls: [] };
+  }
+
+  const res = await postChat(
+    {
+      model: (modelOverride || model()).trim(),
+      messages,
+      tools,
+      tool_choice: "auto",
+      stream: false,
+      temperature,
+      max_tokens: maxTokens,
+      thinking: { type: "disabled" },
+    },
+    signal,
+  );
+
+  const data = (await res.json()) as {
+    choices?: {
+      message?: { content?: string | null; tool_calls?: AssistantToolCall[] };
+    }[];
+  };
+
+  const message = data.choices?.[0]?.message;
+  const rawCalls = Array.isArray(message?.tool_calls) ? message.tool_calls : [];
+  const content = typeof message?.content === "string" ? message.content : "";
+
+  // 不同厂商给的字段有细微差别（有的不给 type、id 也可能缺），
+  // 这里统一补齐，否则回填 role=tool 时对不上号，上游会 400。
+  const toolCalls: AssistantToolCall[] = rawCalls
+    .filter((call) => call && typeof call.function?.name === "string")
+    .map((call, i) => ({
+      id: call.id || `call_${Date.now()}_${i}`,
+      type: "function",
+      function: {
+        name: call.function.name,
+        arguments:
+          typeof call.function.arguments === "string"
+            ? call.function.arguments
+            : JSON.stringify(call.function.arguments ?? {}),
+      },
+    }));
+
+  return { content, toolCalls };
 }
 
 /* ------------------------------------------------------------ 解析流 */

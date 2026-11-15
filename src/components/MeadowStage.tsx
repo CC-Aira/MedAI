@@ -40,6 +40,7 @@ import {
   undoMedicationCheckin,
   uploadAttachment,
   logout,
+  type ToolTrace,
 } from "@/lib/client/api";
 
 /** 与 globals.css 里的 --flow 保持一致 */const FLOW = 1100;
@@ -58,6 +59,10 @@ type ChatItem = {
   editedAt?: string | null;
   /** 非空表示这条不是模型回答，要画成红旗卡片 */
   flag?: string | null;
+  /** 这一轮模型查了什么（只在当前会话里显示，刷新后不保留） */
+  tools?: ToolTrace[];
+  /** 回答开始前的阶段提示 */
+  statusText?: string;
 };
 
 /** 服务端消息 → 气泡 */
@@ -749,8 +754,29 @@ export default function MeadowStage({
             if (mine !== sessionRef.current) return;
             setChat((prev) =>
               prev.map((m) =>
-                m.id === typingId ? { ...m, role: "assistant", content: acc } : m,
+                m.id === typingId
+                  ? { ...m, role: "assistant", content: acc, statusText: undefined }
+                  : m,
               ),
+            );
+          },
+          onStatus: (text) => {
+            if (mine !== sessionRef.current) return;
+            setChat((prev) =>
+              prev.map((m) => (m.id === typingId ? { ...m, statusText: text } : m)),
+            );
+          },
+          onTool: (event) => {
+            if (mine !== sessionRef.current) return;
+            setChat((prev) =>
+              prev.map((m) => {
+                if (m.id !== typingId) return m;
+                const list = m.tools ? [...m.tools] : [];
+                const at = list.findIndex((t) => t.name === event.name);
+                if (at >= 0) list[at] = event;
+                else list.push(event);
+                return { ...m, tools: list };
+              }),
             );
           },
           onDone: ({ messages }) => {
@@ -1518,11 +1544,14 @@ export default function MeadowStage({
         <div className="consult__log" ref={logRef} aria-live="polite">
           {chat.map((m, index) => {
             if (m.role === "typing") {
+              const running = m.tools?.find((t) => t.status === "running");
+              const label = running ? `${running.label}…` : m.statusText;
               return (
                 <p className="msg msg--bot msg--typing" key={m.id}>
                   <i />
                   <i />
                   <i />
+                  {label && <span className="msg__typing-label">{label}</span>}
                 </p>
               );
             }
@@ -1598,6 +1627,23 @@ export default function MeadowStage({
                 }${isStale ? " msg--stale" : ""}`}
                 key={m.id}
               >
+                {!isUser && m.tools && m.tools.length > 0 && (
+                  <span className="msg__tools">
+                    {m.tools.map((t) => (
+                      <span
+                        className="msg__tool"
+                        data-status={t.status}
+                        key={t.name}
+                        title={t.detail ? `${t.label}：${t.detail}` : t.label}
+                      >
+                        <span className="msg__tool-dot" aria-hidden="true" />
+                        {t.label}
+                        {t.detail ? <em>{t.detail}</em> : null}
+                      </span>
+                    ))}
+                  </span>
+                )}
+
                 {m.content}
 
                 {m.attachment && (

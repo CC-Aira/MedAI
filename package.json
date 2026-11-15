@@ -14,9 +14,11 @@
     "pack": "node scripts/pack.mjs",
     "pack:submission": "node scripts/pack-submission.mjs",
     "test:api": "tsx scripts/api-test.ts",
-    "ai:check": "node --env-file=.env scripts/check-ai.mjs"
+    "ai:check": "node --env-file=.env scripts/check-ai.mjs",
+    "mcp": "tsx --env-file=.env scripts/mcp-server.ts"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "@prisma/client": "6.16.2",
     "mammoth": "^1.13.0",
     "next": "16.4.2",

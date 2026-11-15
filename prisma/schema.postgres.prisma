@@ -35,6 +35,7 @@ model User {
   patients     Patient[]
   attachments  Attachment[]
   feedbacks    Feedback[]
+  labReports   LabReport[]
 
   @@index([role, createdAt])
 }
@@ -59,6 +60,7 @@ model Patient {
   medications    Medication[]
   consultations  Consultation[]
   notes          Note[]
+  labReports     LabReport[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -242,4 +244,27 @@ model Feedback {
 
   @@index([status, createdAt])
   @@index([userId, createdAt])
+}
+
+/// 一份化验单（血常规 / 生化 / 尿常规……），由视觉模型从照片里抽成结构化指标。
+/// 指标整体存 JSON 字符串而不是拆表：单子上的项目名与参考区间千差万别。
+model LabReport {
+  id           String   @id @default(cuid())
+  ownerId      String
+  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  patientId    String
+  patient      Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  attachmentId String?
+  /// 采样日期：模型从单子上读，读不到用上传时间
+  takenAt      DateTime
+  hospital     String   @default("")
+  /// 单据类型：血常规 / 肝功能 / 肾功能 / 血脂 / 尿常规 / 其他
+  kind         String   @default("")
+  /// [{ name, value, unit, refText, abnormal }]，abnormal: high | low | ""
+  items        String   @default("[]") @db.Text
+  summary      String   @default("") @db.Text
+  abnormalCount Int     @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([ownerId, patientId, takenAt])
 }
