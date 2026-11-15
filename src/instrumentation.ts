@@ -1,22 +1,19 @@
 /**
- * Next.js instrumentation：服务启动时跑一次。
+ * 服务启动后要做的初始化。
  *
- * 这里只做一件事 —— 把 OCR 引擎预热好。
- * 不预热的话，用户第一次上传图片时的请求里要现加载引擎和语言包，
- * 实测等了 90 秒；预热之后同一张图只要 0.7 秒。
+ * 唯一一件事：把 OCR 引擎预热好 —— 但真正的预热挪到了 layout.tsx 的模块顶层。
  *
- * 失败也不影响启动：OCR 不可用时上传接口会如实返回"没读出文字"，
- * 纯文本/PDF/Word 的解析完全不受影响。
+ * 原因：instrumentation 会被 Next 编译成 node 与 edge 两份。这里只要写一句
+ * `import("@/lib/attachments")`，fs / node:crypto / pdf-parse 就会一起进 edge 那份，
+ * 而 edge 目标不认 `node:` 协议 —— 编译期报错，整个 dev server 直接 500，
+ * 页面上什么都打不开（生产 build 同样会挂）。
+ *
+ * layout 只在 Node 侧编译，import 一个 Node-only 模块是安全的，
+ * 模块缓存保证那段预热只跑一次。
+ *
+ * 这里只留一行日志：确认 instrumentation 这条通路是通的，出问题也好排查。
  */
 export async function register() {
-  // 只在 Node 服务端跑，edge / build 阶段都跳过
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
-
-  try {
-    const { warmUpOcr } = await import("./lib/attachments");
-    const ok = await warmUpOcr();
-    console.log(ok ? "[medai] OCR 引擎已预热" : "[medai] OCR 引擎不可用，图片将读不出文字");
-  } catch (err) {
-    console.error("[medai] OCR 预热失败", err);
-  }
+  console.log("[medai] instrumentation ready");
 }

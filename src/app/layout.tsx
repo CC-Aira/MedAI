@@ -1,7 +1,22 @@
 import type { Metadata, Viewport } from "next";
 import MedicationReminderWatcher from "@/components/MedicationReminderWatcher";
 import { getPlatformName } from "@/lib/settings";
+import { warmUpOcr } from "@/lib/attachments";
 import "./globals.css";
+
+/**
+ * OCR 引擎预热。
+ *
+ * 放在这个模块的顶层，是因为它只在 Node 侧编译 —— instrumentation.ts 会被
+ * 同时编译成 node 与 edge 两份，在那里 import 本模块会把 fs / node:crypto /
+ * pdf-parse 拖进 edge 那份，edge 不认 `node:` 协议，编译直接失败。
+ *
+ * 模块只加载一次，所以这里天然只跑一次；失败不影响任何功能，
+ * 只是第一次上传图片要多等一会儿。
+ */
+if (process.env.NEXT_PHASE !== "phase-production-build") {
+  void warmUpOcr().catch(() => {});
+}
 
 /** 浏览器标签页标题也用后台配置的平台名；各子页自己的 title 不受影响 */
 export async function generateMetadata(): Promise<Metadata> {
